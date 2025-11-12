@@ -20,6 +20,12 @@ type APITokenBulkCreatePayload struct {
 	APITokens []*generated.APIToken `json:"apiTokens,omitempty"`
 }
 
+// Return response for deleteBulkAPIToken mutation
+type APITokenBulkDeletePayload struct {
+	// Deleted apiToken IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createAPIToken mutation
 type APITokenCreatePayload struct {
 	// Created apiToken
@@ -42,6 +48,12 @@ type APITokenUpdatePayload struct {
 type ActionPlanBulkCreatePayload struct {
 	// Created actionPlans
 	ActionPlans []*generated.ActionPlan `json:"actionPlans,omitempty"`
+}
+
+// Return response for deleteBulkActionPlan mutation
+type ActionPlanBulkDeletePayload struct {
+	// Deleted actionPlan IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for updateBulkActionPlan mutation
@@ -76,10 +88,58 @@ type AddProgramMembershipInput struct {
 	UserID string      `json:"userID"`
 }
 
+// Return response for createAssessment mutation
+type AssessmentCreatePayload struct {
+	// Created assessment
+	Assessment *generated.Assessment `json:"assessment"`
+}
+
+// Return response for deleteAssessment mutation
+type AssessmentDeletePayload struct {
+	// Deleted assessment ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for createBulkAssessmentResponse mutation
+type AssessmentResponseBulkCreatePayload struct {
+	// Created assessmentResponses
+	AssessmentResponses []*generated.AssessmentResponse `json:"assessmentResponses,omitempty"`
+}
+
+// Return response for createAssessmentResponse mutation
+type AssessmentResponseCreatePayload struct {
+	// Created assessmentResponse
+	AssessmentResponse *generated.AssessmentResponse `json:"assessmentResponse"`
+}
+
+// Return response for deleteAssessmentResponse mutation
+type AssessmentResponseDeletePayload struct {
+	// Deleted assessmentResponse ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateAssessmentResponse mutation
+type AssessmentResponseUpdatePayload struct {
+	// Updated assessmentResponse
+	AssessmentResponse *generated.AssessmentResponse `json:"assessmentResponse"`
+}
+
+// Return response for updateAssessment mutation
+type AssessmentUpdatePayload struct {
+	// Updated assessment
+	Assessment *generated.Assessment `json:"assessment"`
+}
+
 // Return response for createBulkAsset mutation
 type AssetBulkCreatePayload struct {
 	// Created assets
 	Assets []*generated.Asset `json:"assets,omitempty"`
+}
+
+// Return response for deleteBulkAsset mutation
+type AssetBulkDeletePayload struct {
+	// Deleted asset IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createAsset mutation
@@ -157,6 +217,12 @@ type ContactBulkCreatePayload struct {
 	Contacts []*generated.Contact `json:"contacts,omitempty"`
 }
 
+// Return response for deleteBulkContact mutation
+type ContactBulkDeletePayload struct {
+	// Deleted contact IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for updateBulkContact mutation
 type ContactBulkUpdatePayload struct {
 	// Updated contacts
@@ -187,6 +253,12 @@ type ContactUpdatePayload struct {
 type ControlBulkCreatePayload struct {
 	// Created controls
 	Controls []*generated.Control `json:"controls,omitempty"`
+}
+
+// Return response for deleteBulkControl mutation
+type ControlBulkDeletePayload struct {
+	// Deleted control IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for updateBulkControl mutation
@@ -258,6 +330,12 @@ type ControlImplementationBulkCreatePayload struct {
 	ControlImplementations []*generated.ControlImplementation `json:"controlImplementations,omitempty"`
 }
 
+// Return response for deleteBulkControlImplementation mutation
+type ControlImplementationBulkDeletePayload struct {
+	// Deleted controlImplementation IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createControlImplementation mutation
 type ControlImplementationCreatePayload struct {
 	// Created controlImplementation
@@ -280,6 +358,12 @@ type ControlImplementationUpdatePayload struct {
 type ControlObjectiveBulkCreatePayload struct {
 	// Created controlObjectives
 	ControlObjectives []*generated.ControlObjective `json:"controlObjectives,omitempty"`
+}
+
+// Return response for deleteBulkControlObjective mutation
+type ControlObjectiveBulkDeletePayload struct {
+	// Deleted controlObjective IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createControlObjective mutation
@@ -360,6 +444,12 @@ type CustomDomainBulkCreatePayload struct {
 	CustomDomains []*generated.CustomDomain `json:"customDomains,omitempty"`
 }
 
+// Return response for deleteBulkCustomDomain mutation
+type CustomDomainBulkDeletePayload struct {
+	// Deleted customDomain IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createCustomDomain mutation
 type CustomDomainCreatePayload struct {
 	// Created customDomain
@@ -378,10 +468,40 @@ type CustomDomainUpdatePayload struct {
 	CustomDomain *generated.CustomDomain `json:"customDomain"`
 }
 
+// Return response for createBulkCustomTypeEnum mutation
+type CustomTypeEnumBulkCreatePayload struct {
+	// Created customTypeEnums
+	CustomTypeEnums []*generated.CustomTypeEnum `json:"customTypeEnums,omitempty"`
+}
+
+// Return response for createCustomTypeEnum mutation
+type CustomTypeEnumCreatePayload struct {
+	// Created customTypeEnum
+	CustomTypeEnum *generated.CustomTypeEnum `json:"customTypeEnum"`
+}
+
+// Return response for deleteCustomTypeEnum mutation
+type CustomTypeEnumDeletePayload struct {
+	// Deleted customTypeEnum ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateCustomTypeEnum mutation
+type CustomTypeEnumUpdatePayload struct {
+	// Updated customTypeEnum
+	CustomTypeEnum *generated.CustomTypeEnum `json:"customTypeEnum"`
+}
+
 // Return response for createBulkDNSVerification mutation
 type DNSVerificationBulkCreatePayload struct {
 	// Created dnsVerifications
 	DNSVerifications []*generated.DNSVerification `json:"dnsVerifications,omitempty"`
+}
+
+// Return response for deleteBulkDNSVerification mutation
+type DNSVerificationBulkDeletePayload struct {
+	// Deleted dnsVerification IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createDNSVerification mutation
@@ -408,6 +528,12 @@ type DocumentDataBulkCreatePayload struct {
 	DocumentData []*generated.DocumentData `json:"documentData,omitempty"`
 }
 
+// Return response for deleteBulkDocumentData mutation
+type DocumentDataBulkDeletePayload struct {
+	// Deleted documentData IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createDocumentData mutation
 type DocumentDataCreatePayload struct {
 	// Created documentData
@@ -432,6 +558,12 @@ type EntityBulkCreatePayload struct {
 	Entities []*generated.Entity `json:"entities,omitempty"`
 }
 
+// Return response for deleteBulkEntity mutation
+type EntityBulkDeletePayload struct {
+	// Deleted entity IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createEntity mutation
 type EntityCreatePayload struct {
 	// Created entity
@@ -448,6 +580,12 @@ type EntityDeletePayload struct {
 type EntityTypeBulkCreatePayload struct {
 	// Created entityTypes
 	EntityTypes []*generated.EntityType `json:"entityTypes,omitempty"`
+}
+
+// Return response for deleteBulkEntityType mutation
+type EntityTypeBulkDeletePayload struct {
+	// Deleted entityType IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createEntityType mutation
@@ -478,6 +616,12 @@ type EntityUpdatePayload struct {
 type EventBulkCreatePayload struct {
 	// Created events
 	Events []*generated.Event `json:"events,omitempty"`
+}
+
+// Return response for deleteBulkEvent mutation
+type EventBulkDeletePayload struct {
+	// Deleted event IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createEvent mutation
@@ -558,10 +702,64 @@ type FileDeletePayload struct {
 	DeletedID string `json:"deletedID"`
 }
 
+// Return response for createBulkFinding mutation
+type FindingBulkCreatePayload struct {
+	// Created findings
+	Findings []*generated.Finding `json:"findings,omitempty"`
+}
+
+// Return response for createBulkFindingControl mutation
+type FindingControlBulkCreatePayload struct {
+	// Created findingControls
+	FindingControls []*generated.FindingControl `json:"findingControls,omitempty"`
+}
+
+// Return response for createFindingControl mutation
+type FindingControlCreatePayload struct {
+	// Created findingControl
+	FindingControl *generated.FindingControl `json:"findingControl"`
+}
+
+// Return response for deleteFindingControl mutation
+type FindingControlDeletePayload struct {
+	// Deleted findingControl ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateFindingControl mutation
+type FindingControlUpdatePayload struct {
+	// Updated findingControl
+	FindingControl *generated.FindingControl `json:"findingControl"`
+}
+
+// Return response for createFinding mutation
+type FindingCreatePayload struct {
+	// Created finding
+	Finding *generated.Finding `json:"finding"`
+}
+
+// Return response for deleteFinding mutation
+type FindingDeletePayload struct {
+	// Deleted finding ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateFinding mutation
+type FindingUpdatePayload struct {
+	// Updated finding
+	Finding *generated.Finding `json:"finding"`
+}
+
 // Return response for createBulkGroup mutation
 type GroupBulkCreatePayload struct {
 	// Created groups
 	Groups []*generated.Group `json:"groups,omitempty"`
+}
+
+// Return response for deleteBulkGroup mutation
+type GroupBulkDeletePayload struct {
+	// Deleted group IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createGroup mutation
@@ -587,6 +785,12 @@ type GroupMembersInput struct {
 type GroupMembershipBulkCreatePayload struct {
 	// Created groupMemberships
 	GroupMemberships []*generated.GroupMembership `json:"groupMemberships,omitempty"`
+}
+
+// Return response for deleteBulkGroupMembership mutation
+type GroupMembershipBulkDeletePayload struct {
+	// Deleted groupMembership IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createGroupMembership mutation
@@ -710,6 +914,12 @@ type GroupSettingBulkCreatePayload struct {
 	GroupSettings []*generated.GroupSetting `json:"groupSettings,omitempty"`
 }
 
+// Return response for deleteBulkGroupSetting mutation
+type GroupSettingBulkDeletePayload struct {
+	// Deleted groupSetting IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createGroupSetting mutation
 type GroupSettingCreatePayload struct {
 	// Created groupSetting
@@ -738,6 +948,12 @@ type GroupUpdatePayload struct {
 type HushBulkCreatePayload struct {
 	// Created hushs
 	Hushes []*generated.Hush `json:"hushes,omitempty"`
+}
+
+// Return response for deleteBulkHush mutation
+type HushBulkDeletePayload struct {
+	// Deleted hush IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for updateBulkHush mutation
@@ -778,6 +994,12 @@ type InternalPolicyBulkCreatePayload struct {
 	InternalPolicies []*generated.InternalPolicy `json:"internalPolicies,omitempty"`
 }
 
+// Return response for deleteBulkInternalPolicy mutation
+type InternalPolicyBulkDeletePayload struct {
+	// Deleted internalPolicy IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for updateBulkInternalPolicy mutation
 type InternalPolicyBulkUpdatePayload struct {
 	// Updated internalPolicys
@@ -808,6 +1030,12 @@ type InternalPolicyUpdatePayload struct {
 type InviteBulkCreatePayload struct {
 	// Created invites
 	Invites []*generated.Invite `json:"invites,omitempty"`
+}
+
+// Return response for deleteBulkInvite mutation
+type InviteBulkDeletePayload struct {
+	// Deleted invite IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createInvite mutation
@@ -906,6 +1134,12 @@ type JobTemplateBulkCreatePayload struct {
 	JobTemplates []*generated.JobTemplate `json:"jobTemplates,omitempty"`
 }
 
+// Return response for deleteBulkJobTemplate mutation
+type JobTemplateBulkDeletePayload struct {
+	// Deleted jobTemplate IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createJobTemplate mutation
 type JobTemplateCreatePayload struct {
 	// Created jobTemplate
@@ -928,6 +1162,12 @@ type JobTemplateUpdatePayload struct {
 type MappableDomainBulkCreatePayload struct {
 	// Created mappableDomains
 	MappableDomains []*generated.MappableDomain `json:"mappableDomains,omitempty"`
+}
+
+// Return response for deleteBulkMappableDomain mutation
+type MappableDomainBulkDeletePayload struct {
+	// Deleted mappableDomain IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createMappableDomain mutation
@@ -954,6 +1194,12 @@ type MappedControlBulkCreatePayload struct {
 	MappedControls []*generated.MappedControl `json:"mappedControls,omitempty"`
 }
 
+// Return response for deleteBulkMappedControl mutation
+type MappedControlBulkDeletePayload struct {
+	// Deleted mappedControl IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createMappedControl mutation
 type MappedControlCreatePayload struct {
 	// Created mappedControl
@@ -978,6 +1224,12 @@ type NarrativeBulkCreatePayload struct {
 	Narratives []*generated.Narrative `json:"narratives,omitempty"`
 }
 
+// Return response for deleteBulkNarrative mutation
+type NarrativeBulkDeletePayload struct {
+	// Deleted narrative IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createNarrative mutation
 type NarrativeCreatePayload struct {
 	// Created narrative
@@ -994,6 +1246,12 @@ type NarrativeDeletePayload struct {
 type NarrativeUpdatePayload struct {
 	// Updated narrative
 	Narrative *generated.Narrative `json:"narrative"`
+}
+
+// Return response for deleteComment mutation
+type NoteDeletePayload struct {
+	// Deleted comment ID
+	DeletedID string `json:"deletedID"`
 }
 
 // Return response for createOnboarding mutation
@@ -1013,6 +1271,12 @@ type OrgMembersInput struct {
 type OrgMembershipBulkCreatePayload struct {
 	// Created orgMemberships
 	OrgMemberships []*generated.OrgMembership `json:"orgMemberships,omitempty"`
+}
+
+// Return response for deleteBulkOrgMembership mutation
+type OrgMembershipBulkDeletePayload struct {
+	// Deleted orgMembership IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createOrgMembership mutation
@@ -1055,6 +1319,12 @@ type OrganizationDeletePayload struct {
 type OrganizationSettingBulkCreatePayload struct {
 	// Created organizationSettings
 	OrganizationSettings []*generated.OrganizationSetting `json:"organizationSettings,omitempty"`
+}
+
+// Return response for deleteBulkOrganizationSetting mutation
+type OrganizationSettingBulkDeletePayload struct {
+	// Deleted organizationSetting IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createOrganizationSetting mutation
@@ -1119,6 +1389,12 @@ type ProcedureBulkCreatePayload struct {
 	Procedures []*generated.Procedure `json:"procedures,omitempty"`
 }
 
+// Return response for deleteBulkProcedure mutation
+type ProcedureBulkDeletePayload struct {
+	// Deleted export IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for updateBulkProcedure mutation
 type ProcedureBulkUpdatePayload struct {
 	// Updated procedures
@@ -1151,6 +1427,12 @@ type ProgramBulkCreatePayload struct {
 	Programs []*generated.Program `json:"programs,omitempty"`
 }
 
+// Return response for deleteBulkProgram mutation
+type ProgramBulkDeletePayload struct {
+	// Deleted program IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createProgram mutation
 type ProgramCreatePayload struct {
 	// Created program
@@ -1167,6 +1449,12 @@ type ProgramDeletePayload struct {
 type ProgramMembershipBulkCreatePayload struct {
 	// Created programMemberships
 	ProgramMemberships []*generated.ProgramMembership `json:"programMemberships,omitempty"`
+}
+
+// Return response for deleteBulkProgramMembership mutation
+type ProgramMembershipBulkDeletePayload struct {
+	// Deleted programMembership IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createProgramMembership mutation
@@ -1193,10 +1481,64 @@ type ProgramUpdatePayload struct {
 	Program *generated.Program `json:"program"`
 }
 
+// Return response for createBulkRemediation mutation
+type RemediationBulkCreatePayload struct {
+	// Created remediations
+	Remediations []*generated.Remediation `json:"remediations,omitempty"`
+}
+
+// Return response for createRemediation mutation
+type RemediationCreatePayload struct {
+	// Created remediation
+	Remediation *generated.Remediation `json:"remediation"`
+}
+
+// Return response for deleteRemediation mutation
+type RemediationDeletePayload struct {
+	// Deleted remediation ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateRemediation mutation
+type RemediationUpdatePayload struct {
+	// Updated remediation
+	Remediation *generated.Remediation `json:"remediation"`
+}
+
+// Return response for createBulkReview mutation
+type ReviewBulkCreatePayload struct {
+	// Created reviews
+	Reviews []*generated.Review `json:"reviews,omitempty"`
+}
+
+// Return response for createReview mutation
+type ReviewCreatePayload struct {
+	// Created review
+	Review *generated.Review `json:"review"`
+}
+
+// Return response for deleteReview mutation
+type ReviewDeletePayload struct {
+	// Deleted review ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateReview mutation
+type ReviewUpdatePayload struct {
+	// Updated review
+	Review *generated.Review `json:"review"`
+}
+
 // Return response for createBulkRisk mutation
 type RiskBulkCreatePayload struct {
 	// Created risks
 	Risks []*generated.Risk `json:"risks,omitempty"`
+}
+
+// Return response for deleteBulkRisk mutation
+type RiskBulkDeletePayload struct {
+	// Deleted risk IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for updateBulkRisk mutation
@@ -1231,6 +1573,12 @@ type ScanBulkCreatePayload struct {
 	Scans []*generated.Scan `json:"scans,omitempty"`
 }
 
+// Return response for deleteBulkScan mutation
+type ScanBulkDeletePayload struct {
+	// Deleted scan IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for updateBulkScan mutation
 type ScanBulkUpdatePayload struct {
 	// Updated scans
@@ -1261,6 +1609,12 @@ type ScanUpdatePayload struct {
 type ScheduledJobBulkCreatePayload struct {
 	// Created scheduledJobs
 	ScheduledJobs []*generated.ScheduledJob `json:"scheduledJobs,omitempty"`
+}
+
+// Return response for deleteBulkScheduledJob mutation
+type ScheduledJobBulkDeletePayload struct {
+	// Deleted scheduledJob IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createScheduledJob mutation
@@ -1306,12 +1660,15 @@ type SearchResults struct {
 	TotalCount                  int                                             `json:"totalCount"`
 	APITokens                   *generated.APITokenConnection                   `json:"apiTokens,omitempty"`
 	ActionPlans                 *generated.ActionPlanConnection                 `json:"actionPlans,omitempty"`
+	Assessments                 *generated.AssessmentConnection                 `json:"assessments,omitempty"`
+	AssessmentResponses         *generated.AssessmentResponseConnection         `json:"assessmentResponses,omitempty"`
 	Assets                      *generated.AssetConnection                      `json:"assets,omitempty"`
 	Contacts                    *generated.ContactConnection                    `json:"contacts,omitempty"`
 	Controls                    *generated.ControlConnection                    `json:"controls,omitempty"`
 	ControlImplementations      *generated.ControlImplementationConnection      `json:"controlImplementations,omitempty"`
 	ControlObjectives           *generated.ControlObjectiveConnection           `json:"controlObjectives,omitempty"`
 	CustomDomains               *generated.CustomDomainConnection               `json:"customDomains,omitempty"`
+	CustomTypeEnums             *generated.CustomTypeEnumConnection             `json:"customTypeEnums,omitempty"`
 	DNSVerifications            *generated.DNSVerificationConnection            `json:"dnsVerifications,omitempty"`
 	DocumentData                *generated.DocumentDataConnection               `json:"documentData,omitempty"`
 	Entities                    *generated.EntityConnection                     `json:"entities,omitempty"`
@@ -1319,6 +1676,7 @@ type SearchResults struct {
 	Events                      *generated.EventConnection                      `json:"events,omitempty"`
 	Evidences                   *generated.EvidenceConnection                   `json:"evidences,omitempty"`
 	Files                       *generated.FileConnection                       `json:"files,omitempty"`
+	Findings                    *generated.FindingConnection                    `json:"findings,omitempty"`
 	Groups                      *generated.GroupConnection                      `json:"groups,omitempty"`
 	Integrations                *generated.IntegrationConnection                `json:"integrations,omitempty"`
 	InternalPolicies            *generated.InternalPolicyConnection             `json:"internalPolicies,omitempty"`
@@ -1336,12 +1694,15 @@ type SearchResults struct {
 	PersonalAccessTokens        *generated.PersonalAccessTokenConnection        `json:"personalAccessTokens,omitempty"`
 	Procedures                  *generated.ProcedureConnection                  `json:"procedures,omitempty"`
 	Programs                    *generated.ProgramConnection                    `json:"programs,omitempty"`
+	Remediations                *generated.RemediationConnection                `json:"remediations,omitempty"`
+	Reviews                     *generated.ReviewConnection                     `json:"reviews,omitempty"`
 	Risks                       *generated.RiskConnection                       `json:"risks,omitempty"`
 	Scans                       *generated.ScanConnection                       `json:"scans,omitempty"`
 	Standards                   *generated.StandardConnection                   `json:"standards,omitempty"`
 	Subcontrols                 *generated.SubcontrolConnection                 `json:"subcontrols,omitempty"`
 	Subprocessors               *generated.SubprocessorConnection               `json:"subprocessors,omitempty"`
 	Subscribers                 *generated.SubscriberConnection                 `json:"subscribers,omitempty"`
+	TagDefinitions              *generated.TagDefinitionConnection              `json:"tagDefinitions,omitempty"`
 	Tasks                       *generated.TaskConnection                       `json:"tasks,omitempty"`
 	Templates                   *generated.TemplateConnection                   `json:"templates,omitempty"`
 	TrustCenters                *generated.TrustCenterConnection                `json:"trustCenters,omitempty"`
@@ -1349,6 +1710,7 @@ type SearchResults struct {
 	TrustCenterDocs             *generated.TrustCenterDocConnection             `json:"trustCenterDocs,omitempty"`
 	Users                       *generated.UserConnection                       `json:"users,omitempty"`
 	UserSettings                *generated.UserSettingConnection                `json:"userSettings,omitempty"`
+	Vulnerabilities             *generated.VulnerabilityConnection              `json:"vulnerabilities,omitempty"`
 	Webauthns                   *generated.WebauthnConnection                   `json:"webauthns,omitempty"`
 	SearchContext               []*models.SearchContext                         `json:"searchContext,omitempty"`
 }
@@ -1394,6 +1756,12 @@ type SubcontrolBulkCreatePayload struct {
 	Subcontrols []*generated.Subcontrol `json:"subcontrols,omitempty"`
 }
 
+// Return response for deleteBulkSubcontrol mutation
+type SubcontrolBulkDeletePayload struct {
+	// Deleted subcontrol IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createSubcontrol mutation
 type SubcontrolCreatePayload struct {
 	// Created subcontrol
@@ -1427,6 +1795,12 @@ type SubmitTrustCenterNDAResponsePayload struct {
 type SubprocessorBulkCreatePayload struct {
 	// Created subprocessors
 	Subprocessors []*generated.Subprocessor `json:"subprocessors,omitempty"`
+}
+
+// Return response for deleteBulkSubprocessor mutation
+type SubprocessorBulkDeletePayload struct {
+	// Deleted subprocessor IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createSubprocessor mutation
@@ -1471,6 +1845,9 @@ type SubscriberUpdatePayload struct {
 	Subscriber *generated.Subscriber `json:"subscriber"`
 }
 
+type Subscription struct {
+}
+
 // Return response for createTFASetting mutation
 type TFASettingCreatePayload struct {
 	// Created tfaSetting
@@ -1488,10 +1865,40 @@ type TFASettingUpdatePayload struct {
 	RecoveryCodes []string              `json:"recoveryCodes,omitempty"`
 }
 
+// Return response for createBulkTagDefinition mutation
+type TagDefinitionBulkCreatePayload struct {
+	// Created tagDefinitions
+	TagDefinitions []*generated.TagDefinition `json:"tagDefinitions,omitempty"`
+}
+
+// Return response for createTagDefinition mutation
+type TagDefinitionCreatePayload struct {
+	// Created tagDefinition
+	TagDefinition *generated.TagDefinition `json:"tagDefinition"`
+}
+
+// Return response for deleteTagDefinition mutation
+type TagDefinitionDeletePayload struct {
+	// Deleted tagDefinition ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateTagDefinition mutation
+type TagDefinitionUpdatePayload struct {
+	// Updated tagDefinition
+	TagDefinition *generated.TagDefinition `json:"tagDefinition"`
+}
+
 // Return response for createBulkTask mutation
 type TaskBulkCreatePayload struct {
 	// Created tasks
 	Tasks []*generated.Task `json:"tasks,omitempty"`
+}
+
+// Return response for deleteBulkTask mutation
+type TaskBulkDeletePayload struct {
+	// Deleted task IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for updateBulkTask mutation
@@ -1526,6 +1933,12 @@ type TemplateBulkCreatePayload struct {
 	Templates []*generated.Template `json:"templates,omitempty"`
 }
 
+// Return response for deleteBulkTemplate mutation
+type TemplateBulkDeletePayload struct {
+	// Deleted template IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createTemplate mutation
 type TemplateCreatePayload struct {
 	// Created template
@@ -1548,6 +1961,12 @@ type TemplateUpdatePayload struct {
 type TrustCenterComplianceBulkCreatePayload struct {
 	// Created trustCenterCompliances
 	TrustCenterCompliances []*generated.TrustCenterCompliance `json:"trustCenterCompliances,omitempty"`
+}
+
+// Return response for deleteBulkTrustCenterCompliance mutation
+type TrustCenterComplianceBulkDeletePayload struct {
+	// Deleted trustCenterCompliance IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createTrustCenterCompliance mutation
@@ -1584,6 +2003,20 @@ type TrustCenterDeletePayload struct {
 type TrustCenterDocBulkCreatePayload struct {
 	// Created trustCenterDocs
 	TrustCenterDocs []*generated.TrustCenterDoc `json:"trustCenterDocs,omitempty"`
+}
+
+// Return response for deleteBulkTrustCenterDoc mutation
+type TrustCenterDocBulkDeletePayload struct {
+	// Deleted trustCenterDoc IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
+// Return response for updateBulkTrustCenterDoc mutation
+type TrustCenterDocBulkUpdatePayload struct {
+	// Updated trust center docs
+	TrustCenterDocs []*generated.TrustCenterDoc `json:"trustCenterDocs,omitempty"`
+	// IDs of the updated trust center docs
+	UpdatedIDs []string `json:"updatedIDs,omitempty"`
 }
 
 // Return response for createTrustCenterDoc mutation
@@ -1645,6 +2078,12 @@ type TrustCenterSettingUpdatePayload struct {
 type TrustCenterSubprocessorBulkCreatePayload struct {
 	// Created trustCenterSubprocessors
 	TrustCenterSubprocessors []*generated.TrustCenterSubprocessor `json:"trustCenterSubprocessors,omitempty"`
+}
+
+// Return response for deleteBulkTrustCenterSubprocessor mutation
+type TrustCenterSubprocessorBulkDeletePayload struct {
+	// Deleted trustCenterSubprocessor IDs
+	DeletedIDs []string `json:"deletedIDs"`
 }
 
 // Return response for createTrustCenterSubprocessor mutation
@@ -1719,6 +2158,12 @@ type UserSettingBulkCreatePayload struct {
 	UserSettings []*generated.UserSetting `json:"userSettings,omitempty"`
 }
 
+// Return response for deleteBulkUserSetting mutation
+type UserSettingBulkDeletePayload struct {
+	// Deleted userSetting IDs
+	DeletedIDs []string `json:"deletedIDs"`
+}
+
 // Return response for createUserSetting mutation
 type UserSettingCreatePayload struct {
 	// Created userSetting
@@ -1735,6 +2180,30 @@ type UserSettingUpdatePayload struct {
 type UserUpdatePayload struct {
 	// Updated user
 	User *generated.User `json:"user"`
+}
+
+// Return response for createBulkVulnerability mutation
+type VulnerabilityBulkCreatePayload struct {
+	// Created vulnerabilitys
+	Vulnerabilities []*generated.Vulnerability `json:"vulnerabilities,omitempty"`
+}
+
+// Return response for createVulnerability mutation
+type VulnerabilityCreatePayload struct {
+	// Created vulnerability
+	Vulnerability *generated.Vulnerability `json:"vulnerability"`
+}
+
+// Return response for deleteVulnerability mutation
+type VulnerabilityDeletePayload struct {
+	// Deleted vulnerability ID
+	DeletedID string `json:"deletedID"`
+}
+
+// Return response for updateVulnerability mutation
+type VulnerabilityUpdatePayload struct {
+	// Updated vulnerability
+	Vulnerability *generated.Vulnerability `json:"vulnerability"`
 }
 
 // Return response for deleteWebauthn mutation

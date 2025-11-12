@@ -11,6 +11,12 @@ func (c *Client) WithHistory() {
 	for _, hook := range history.Hooks[*ActionPlanMutation]() {
 		c.ActionPlan.Use(hook)
 	}
+	for _, hook := range history.Hooks[*AssessmentMutation]() {
+		c.Assessment.Use(hook)
+	}
+	for _, hook := range history.Hooks[*AssessmentResponseMutation]() {
+		c.AssessmentResponse.Use(hook)
+	}
 	for _, hook := range history.Hooks[*AssetMutation]() {
 		c.Asset.Use(hook)
 	}
@@ -46,6 +52,12 @@ func (c *Client) WithHistory() {
 	}
 	for _, hook := range history.Hooks[*FileMutation]() {
 		c.File.Use(hook)
+	}
+	for _, hook := range history.Hooks[*FindingMutation]() {
+		c.Finding.Use(hook)
+	}
+	for _, hook := range history.Hooks[*FindingControlMutation]() {
+		c.FindingControl.Use(hook)
 	}
 	for _, hook := range history.Hooks[*GroupMutation]() {
 		c.Group.Use(hook)
@@ -101,6 +113,12 @@ func (c *Client) WithHistory() {
 	for _, hook := range history.Hooks[*ProgramMembershipMutation]() {
 		c.ProgramMembership.Use(hook)
 	}
+	for _, hook := range history.Hooks[*RemediationMutation]() {
+		c.Remediation.Use(hook)
+	}
+	for _, hook := range history.Hooks[*ReviewMutation]() {
+		c.Review.Use(hook)
+	}
 	for _, hook := range history.Hooks[*RiskMutation]() {
 		c.Risk.Use(hook)
 	}
@@ -148,5 +166,8 @@ func (c *Client) WithHistory() {
 	}
 	for _, hook := range history.Hooks[*UserSettingMutation]() {
 		c.UserSetting.Use(hook)
+	}
+	for _, hook := range history.Hooks[*VulnerabilityMutation]() {
+		c.Vulnerability.Use(hook)
 	}
 }

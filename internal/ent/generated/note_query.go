@@ -15,11 +15,15 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/theopenlane/core/internal/ent/generated/control"
 	"github.com/theopenlane/core/internal/ent/generated/file"
+	"github.com/theopenlane/core/internal/ent/generated/internalpolicy"
 	"github.com/theopenlane/core/internal/ent/generated/note"
 	"github.com/theopenlane/core/internal/ent/generated/organization"
 	"github.com/theopenlane/core/internal/ent/generated/predicate"
+	"github.com/theopenlane/core/internal/ent/generated/procedure"
+	"github.com/theopenlane/core/internal/ent/generated/risk"
 	"github.com/theopenlane/core/internal/ent/generated/subcontrol"
 	"github.com/theopenlane/core/internal/ent/generated/task"
+	"github.com/theopenlane/core/internal/ent/generated/trustcenter"
 
 	"github.com/theopenlane/core/internal/ent/generated/internal"
 )
@@ -27,19 +31,23 @@ import (
 // NoteQuery is the builder for querying Note entities.
 type NoteQuery struct {
 	config
-	ctx            *QueryContext
-	order          []note.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Note
-	withOwner      *OrganizationQuery
-	withTask       *TaskQuery
-	withControl    *ControlQuery
-	withSubcontrol *SubcontrolQuery
-	withFiles      *FileQuery
-	withFKs        bool
-	loadTotal      []func(context.Context, []*Note) error
-	modifiers      []func(*sql.Selector)
-	withNamedFiles map[string]*FileQuery
+	ctx                *QueryContext
+	order              []note.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Note
+	withOwner          *OrganizationQuery
+	withTask           *TaskQuery
+	withControl        *ControlQuery
+	withSubcontrol     *SubcontrolQuery
+	withProcedure      *ProcedureQuery
+	withRisk           *RiskQuery
+	withInternalPolicy *InternalPolicyQuery
+	withTrustCenter    *TrustCenterQuery
+	withFiles          *FileQuery
+	withFKs            bool
+	loadTotal          []func(context.Context, []*Note) error
+	modifiers          []func(*sql.Selector)
+	withNamedFiles     map[string]*FileQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -169,6 +177,106 @@ func (_q *NoteQuery) QuerySubcontrol() *SubcontrolQuery {
 		)
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.Subcontrol
+		step.Edge.Schema = schemaConfig.Note
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProcedure chains the current query on the "procedure" edge.
+func (_q *NoteQuery) QueryProcedure() *ProcedureQuery {
+	query := (&ProcedureClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(note.Table, note.FieldID, selector),
+			sqlgraph.To(procedure.Table, procedure.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, note.ProcedureTable, note.ProcedureColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.Procedure
+		step.Edge.Schema = schemaConfig.Note
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRisk chains the current query on the "risk" edge.
+func (_q *NoteQuery) QueryRisk() *RiskQuery {
+	query := (&RiskClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(note.Table, note.FieldID, selector),
+			sqlgraph.To(risk.Table, risk.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, note.RiskTable, note.RiskColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.Risk
+		step.Edge.Schema = schemaConfig.Note
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInternalPolicy chains the current query on the "internal_policy" edge.
+func (_q *NoteQuery) QueryInternalPolicy() *InternalPolicyQuery {
+	query := (&InternalPolicyClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(note.Table, note.FieldID, selector),
+			sqlgraph.To(internalpolicy.Table, internalpolicy.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, note.InternalPolicyTable, note.InternalPolicyColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.InternalPolicy
+		step.Edge.Schema = schemaConfig.Note
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTrustCenter chains the current query on the "trust_center" edge.
+func (_q *NoteQuery) QueryTrustCenter() *TrustCenterQuery {
+	query := (&TrustCenterClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(note.Table, note.FieldID, selector),
+			sqlgraph.To(trustcenter.Table, trustcenter.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, note.TrustCenterTable, note.TrustCenterColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.TrustCenter
 		step.Edge.Schema = schemaConfig.Note
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -388,16 +496,20 @@ func (_q *NoteQuery) Clone() *NoteQuery {
 		return nil
 	}
 	return &NoteQuery{
-		config:         _q.config,
-		ctx:            _q.ctx.Clone(),
-		order:          append([]note.OrderOption{}, _q.order...),
-		inters:         append([]Interceptor{}, _q.inters...),
-		predicates:     append([]predicate.Note{}, _q.predicates...),
-		withOwner:      _q.withOwner.Clone(),
-		withTask:       _q.withTask.Clone(),
-		withControl:    _q.withControl.Clone(),
-		withSubcontrol: _q.withSubcontrol.Clone(),
-		withFiles:      _q.withFiles.Clone(),
+		config:             _q.config,
+		ctx:                _q.ctx.Clone(),
+		order:              append([]note.OrderOption{}, _q.order...),
+		inters:             append([]Interceptor{}, _q.inters...),
+		predicates:         append([]predicate.Note{}, _q.predicates...),
+		withOwner:          _q.withOwner.Clone(),
+		withTask:           _q.withTask.Clone(),
+		withControl:        _q.withControl.Clone(),
+		withSubcontrol:     _q.withSubcontrol.Clone(),
+		withProcedure:      _q.withProcedure.Clone(),
+		withRisk:           _q.withRisk.Clone(),
+		withInternalPolicy: _q.withInternalPolicy.Clone(),
+		withTrustCenter:    _q.withTrustCenter.Clone(),
+		withFiles:          _q.withFiles.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -446,6 +558,50 @@ func (_q *NoteQuery) WithSubcontrol(opts ...func(*SubcontrolQuery)) *NoteQuery {
 		opt(query)
 	}
 	_q.withSubcontrol = query
+	return _q
+}
+
+// WithProcedure tells the query-builder to eager-load the nodes that are connected to
+// the "procedure" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NoteQuery) WithProcedure(opts ...func(*ProcedureQuery)) *NoteQuery {
+	query := (&ProcedureClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withProcedure = query
+	return _q
+}
+
+// WithRisk tells the query-builder to eager-load the nodes that are connected to
+// the "risk" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NoteQuery) WithRisk(opts ...func(*RiskQuery)) *NoteQuery {
+	query := (&RiskClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRisk = query
+	return _q
+}
+
+// WithInternalPolicy tells the query-builder to eager-load the nodes that are connected to
+// the "internal_policy" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NoteQuery) WithInternalPolicy(opts ...func(*InternalPolicyQuery)) *NoteQuery {
+	query := (&InternalPolicyClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withInternalPolicy = query
+	return _q
+}
+
+// WithTrustCenter tells the query-builder to eager-load the nodes that are connected to
+// the "trust_center" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NoteQuery) WithTrustCenter(opts ...func(*TrustCenterQuery)) *NoteQuery {
+	query := (&TrustCenterClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withTrustCenter = query
 	return _q
 }
 
@@ -545,15 +701,19 @@ func (_q *NoteQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Note, e
 		nodes       = []*Note{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [9]bool{
 			_q.withOwner != nil,
 			_q.withTask != nil,
 			_q.withControl != nil,
 			_q.withSubcontrol != nil,
+			_q.withProcedure != nil,
+			_q.withRisk != nil,
+			_q.withInternalPolicy != nil,
+			_q.withTrustCenter != nil,
 			_q.withFiles != nil,
 		}
 	)
-	if _q.withTask != nil || _q.withControl != nil || _q.withSubcontrol != nil {
+	if _q.withTask != nil || _q.withControl != nil || _q.withSubcontrol != nil || _q.withProcedure != nil || _q.withRisk != nil || _q.withInternalPolicy != nil || _q.withTrustCenter != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -603,6 +763,30 @@ func (_q *NoteQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Note, e
 	if query := _q.withSubcontrol; query != nil {
 		if err := _q.loadSubcontrol(ctx, query, nodes, nil,
 			func(n *Note, e *Subcontrol) { n.Edges.Subcontrol = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withProcedure; query != nil {
+		if err := _q.loadProcedure(ctx, query, nodes, nil,
+			func(n *Note, e *Procedure) { n.Edges.Procedure = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRisk; query != nil {
+		if err := _q.loadRisk(ctx, query, nodes, nil,
+			func(n *Note, e *Risk) { n.Edges.Risk = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withInternalPolicy; query != nil {
+		if err := _q.loadInternalPolicy(ctx, query, nodes, nil,
+			func(n *Note, e *InternalPolicy) { n.Edges.InternalPolicy = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withTrustCenter; query != nil {
+		if err := _q.loadTrustCenter(ctx, query, nodes, nil,
+			func(n *Note, e *TrustCenter) { n.Edges.TrustCenter = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -746,6 +930,134 @@ func (_q *NoteQuery) loadSubcontrol(ctx context.Context, query *SubcontrolQuery,
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "subcontrol_comments" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *NoteQuery) loadProcedure(ctx context.Context, query *ProcedureQuery, nodes []*Note, init func(*Note), assign func(*Note, *Procedure)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Note)
+	for i := range nodes {
+		if nodes[i].procedure_comments == nil {
+			continue
+		}
+		fk := *nodes[i].procedure_comments
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(procedure.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "procedure_comments" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *NoteQuery) loadRisk(ctx context.Context, query *RiskQuery, nodes []*Note, init func(*Note), assign func(*Note, *Risk)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Note)
+	for i := range nodes {
+		if nodes[i].risk_comments == nil {
+			continue
+		}
+		fk := *nodes[i].risk_comments
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(risk.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "risk_comments" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *NoteQuery) loadInternalPolicy(ctx context.Context, query *InternalPolicyQuery, nodes []*Note, init func(*Note), assign func(*Note, *InternalPolicy)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Note)
+	for i := range nodes {
+		if nodes[i].internal_policy_comments == nil {
+			continue
+		}
+		fk := *nodes[i].internal_policy_comments
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(internalpolicy.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "internal_policy_comments" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *NoteQuery) loadTrustCenter(ctx context.Context, query *TrustCenterQuery, nodes []*Note, init func(*Note), assign func(*Note, *TrustCenter)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Note)
+	for i := range nodes {
+		if nodes[i].trust_center_posts == nil {
+			continue
+		}
+		fk := *nodes[i].trust_center_posts
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(trustcenter.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "trust_center_posts" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

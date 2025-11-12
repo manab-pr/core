@@ -161,7 +161,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [7]ent.Hook
+	Hooks        [8]ent.Hook
 	Interceptors [3]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -217,7 +217,7 @@ const DefaultIdentityProvider enums.SSOProvider = "NONE"
 // IdentityProviderValidator is a validator for the "identity_provider" field enum values. It is called by the builders before save.
 func IdentityProviderValidator(ip enums.SSOProvider) error {
 	switch ip.String() {
-	case "OKTA", "ONE_LOGIN", "GOOGLE_WORKSPACE", "SLACK", "GITHUB", "NONE":
+	case "OKTA", "ONE_LOGIN", "GOOGLE_WORKSPACE", "SLACK", "GITHUB", "MICROSOFT_ENTRA_ID", "GENERIC_OIDC", "NONE":
 		return nil
 	default:
 		return fmt.Errorf("organizationsetting: invalid enum value for identity_provider field: %q", ip)

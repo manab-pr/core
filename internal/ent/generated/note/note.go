@@ -41,6 +41,14 @@ const (
 	EdgeControl = "control"
 	// EdgeSubcontrol holds the string denoting the subcontrol edge name in mutations.
 	EdgeSubcontrol = "subcontrol"
+	// EdgeProcedure holds the string denoting the procedure edge name in mutations.
+	EdgeProcedure = "procedure"
+	// EdgeRisk holds the string denoting the risk edge name in mutations.
+	EdgeRisk = "risk"
+	// EdgeInternalPolicy holds the string denoting the internal_policy edge name in mutations.
+	EdgeInternalPolicy = "internal_policy"
+	// EdgeTrustCenter holds the string denoting the trust_center edge name in mutations.
+	EdgeTrustCenter = "trust_center"
 	// EdgeFiles holds the string denoting the files edge name in mutations.
 	EdgeFiles = "files"
 	// Table holds the table name of the note in the database.
@@ -73,6 +81,34 @@ const (
 	SubcontrolInverseTable = "subcontrols"
 	// SubcontrolColumn is the table column denoting the subcontrol relation/edge.
 	SubcontrolColumn = "subcontrol_comments"
+	// ProcedureTable is the table that holds the procedure relation/edge.
+	ProcedureTable = "notes"
+	// ProcedureInverseTable is the table name for the Procedure entity.
+	// It exists in this package in order to avoid circular dependency with the "procedure" package.
+	ProcedureInverseTable = "procedures"
+	// ProcedureColumn is the table column denoting the procedure relation/edge.
+	ProcedureColumn = "procedure_comments"
+	// RiskTable is the table that holds the risk relation/edge.
+	RiskTable = "notes"
+	// RiskInverseTable is the table name for the Risk entity.
+	// It exists in this package in order to avoid circular dependency with the "risk" package.
+	RiskInverseTable = "risks"
+	// RiskColumn is the table column denoting the risk relation/edge.
+	RiskColumn = "risk_comments"
+	// InternalPolicyTable is the table that holds the internal_policy relation/edge.
+	InternalPolicyTable = "notes"
+	// InternalPolicyInverseTable is the table name for the InternalPolicy entity.
+	// It exists in this package in order to avoid circular dependency with the "internalpolicy" package.
+	InternalPolicyInverseTable = "internal_policies"
+	// InternalPolicyColumn is the table column denoting the internal_policy relation/edge.
+	InternalPolicyColumn = "internal_policy_comments"
+	// TrustCenterTable is the table that holds the trust_center relation/edge.
+	TrustCenterTable = "notes"
+	// TrustCenterInverseTable is the table name for the TrustCenter entity.
+	// It exists in this package in order to avoid circular dependency with the "trustcenter" package.
+	TrustCenterInverseTable = "trust_centers"
+	// TrustCenterColumn is the table column denoting the trust_center relation/edge.
+	TrustCenterColumn = "trust_center_posts"
 	// FilesTable is the table that holds the files relation/edge.
 	FilesTable = "files"
 	// FilesInverseTable is the table name for the File entity.
@@ -101,9 +137,17 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"control_comments",
 	"entity_notes",
+	"finding_comments",
+	"internal_policy_comments",
+	"procedure_comments",
 	"program_notes",
+	"remediation_comments",
+	"review_comments",
+	"risk_comments",
 	"subcontrol_comments",
 	"task_comments",
+	"trust_center_posts",
+	"vulnerability_comments",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -227,6 +271,34 @@ func BySubcontrolField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByProcedureField orders the results by procedure field.
+func ByProcedureField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProcedureStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByRiskField orders the results by risk field.
+func ByRiskField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRiskStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByInternalPolicyField orders the results by internal_policy field.
+func ByInternalPolicyField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInternalPolicyStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByTrustCenterField orders the results by trust_center field.
+func ByTrustCenterField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTrustCenterStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByFilesCount orders the results by files count.
 func ByFilesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -266,6 +338,34 @@ func newSubcontrolStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubcontrolInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, SubcontrolTable, SubcontrolColumn),
+	)
+}
+func newProcedureStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProcedureInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ProcedureTable, ProcedureColumn),
+	)
+}
+func newRiskStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RiskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, RiskTable, RiskColumn),
+	)
+}
+func newInternalPolicyStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InternalPolicyInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, InternalPolicyTable, InternalPolicyColumn),
+	)
+}
+func newTrustCenterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TrustCenterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, TrustCenterTable, TrustCenterColumn),
 	)
 }
 func newFilesStep() *sqlgraph.Step {

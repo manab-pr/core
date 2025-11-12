@@ -70,6 +70,10 @@ func (ec *executionContext) fieldContext_TrustCenterCreatePayload_trustCenter(_ 
 				return ec.fieldContext_TrustCenter_slug(ctx, field)
 			case "customDomainID":
 				return ec.fieldContext_TrustCenter_customDomainID(ctx, field)
+			case "pirschDomainID":
+				return ec.fieldContext_TrustCenter_pirschDomainID(ctx, field)
+			case "pirschIdentificationCode":
+				return ec.fieldContext_TrustCenter_pirschIdentificationCode(ctx, field)
 			case "owner":
 				return ec.fieldContext_TrustCenter_owner(ctx, field)
 			case "customDomain":
@@ -86,6 +90,8 @@ func (ec *executionContext) fieldContext_TrustCenterCreatePayload_trustCenter(_ 
 				return ec.fieldContext_TrustCenter_trustCenterCompliances(ctx, field)
 			case "templates":
 				return ec.fieldContext_TrustCenter_templates(ctx, field)
+			case "posts":
+				return ec.fieldContext_TrustCenter_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TrustCenter", field.Name)
 		},
@@ -164,6 +170,10 @@ func (ec *executionContext) fieldContext_TrustCenterUpdatePayload_trustCenter(_ 
 				return ec.fieldContext_TrustCenter_slug(ctx, field)
 			case "customDomainID":
 				return ec.fieldContext_TrustCenter_customDomainID(ctx, field)
+			case "pirschDomainID":
+				return ec.fieldContext_TrustCenter_pirschDomainID(ctx, field)
+			case "pirschIdentificationCode":
+				return ec.fieldContext_TrustCenter_pirschIdentificationCode(ctx, field)
 			case "owner":
 				return ec.fieldContext_TrustCenter_owner(ctx, field)
 			case "customDomain":
@@ -180,6 +190,8 @@ func (ec *executionContext) fieldContext_TrustCenterUpdatePayload_trustCenter(_ 
 				return ec.fieldContext_TrustCenter_trustCenterCompliances(ctx, field)
 			case "templates":
 				return ec.fieldContext_TrustCenter_templates(ctx, field)
+			case "posts":
+				return ec.fieldContext_TrustCenter_posts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TrustCenter", field.Name)
 		},

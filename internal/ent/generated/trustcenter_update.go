@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/theopenlane/core/internal/ent/generated/customdomain"
+	"github.com/theopenlane/core/internal/ent/generated/note"
 	"github.com/theopenlane/core/internal/ent/generated/organization"
 	"github.com/theopenlane/core/internal/ent/generated/predicate"
 	"github.com/theopenlane/core/internal/ent/generated/template"
@@ -190,6 +191,46 @@ func (_u *TrustCenterUpdate) ClearCustomDomainID() *TrustCenterUpdate {
 	return _u
 }
 
+// SetPirschDomainID sets the "pirsch_domain_id" field.
+func (_u *TrustCenterUpdate) SetPirschDomainID(v string) *TrustCenterUpdate {
+	_u.mutation.SetPirschDomainID(v)
+	return _u
+}
+
+// SetNillablePirschDomainID sets the "pirsch_domain_id" field if the given value is not nil.
+func (_u *TrustCenterUpdate) SetNillablePirschDomainID(v *string) *TrustCenterUpdate {
+	if v != nil {
+		_u.SetPirschDomainID(*v)
+	}
+	return _u
+}
+
+// ClearPirschDomainID clears the value of the "pirsch_domain_id" field.
+func (_u *TrustCenterUpdate) ClearPirschDomainID() *TrustCenterUpdate {
+	_u.mutation.ClearPirschDomainID()
+	return _u
+}
+
+// SetPirschIdentificationCode sets the "pirsch_identification_code" field.
+func (_u *TrustCenterUpdate) SetPirschIdentificationCode(v string) *TrustCenterUpdate {
+	_u.mutation.SetPirschIdentificationCode(v)
+	return _u
+}
+
+// SetNillablePirschIdentificationCode sets the "pirsch_identification_code" field if the given value is not nil.
+func (_u *TrustCenterUpdate) SetNillablePirschIdentificationCode(v *string) *TrustCenterUpdate {
+	if v != nil {
+		_u.SetPirschIdentificationCode(*v)
+	}
+	return _u
+}
+
+// ClearPirschIdentificationCode clears the value of the "pirsch_identification_code" field.
+func (_u *TrustCenterUpdate) ClearPirschIdentificationCode() *TrustCenterUpdate {
+	_u.mutation.ClearPirschIdentificationCode()
+	return _u
+}
+
 // SetOwner sets the "owner" edge to the Organization entity.
 func (_u *TrustCenterUpdate) SetOwner(v *Organization) *TrustCenterUpdate {
 	return _u.SetOwnerID(v.ID)
@@ -296,6 +337,21 @@ func (_u *TrustCenterUpdate) AddTemplates(v ...*Template) *TrustCenterUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddTemplateIDs(ids...)
+}
+
+// AddPostIDs adds the "posts" edge to the Note entity by IDs.
+func (_u *TrustCenterUpdate) AddPostIDs(ids ...string) *TrustCenterUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
+}
+
+// AddPosts adds the "posts" edges to the Note entity.
+func (_u *TrustCenterUpdate) AddPosts(v ...*Note) *TrustCenterUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPostIDs(ids...)
 }
 
 // Mutation returns the TrustCenterMutation object of the builder.
@@ -409,6 +465,27 @@ func (_u *TrustCenterUpdate) RemoveTemplates(v ...*Template) *TrustCenterUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveTemplateIDs(ids...)
+}
+
+// ClearPosts clears all "posts" edges to the Note entity.
+func (_u *TrustCenterUpdate) ClearPosts() *TrustCenterUpdate {
+	_u.mutation.ClearPosts()
+	return _u
+}
+
+// RemovePostIDs removes the "posts" edge to Note entities by IDs.
+func (_u *TrustCenterUpdate) RemovePostIDs(ids ...string) *TrustCenterUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
+}
+
+// RemovePosts removes "posts" edges to Note entities.
+func (_u *TrustCenterUpdate) RemovePosts(v ...*Note) *TrustCenterUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePostIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -527,6 +604,18 @@ func (_u *TrustCenterUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if _u.mutation.SlugCleared() {
 		_spec.ClearField(trustcenter.FieldSlug, field.TypeString)
+	}
+	if value, ok := _u.mutation.PirschDomainID(); ok {
+		_spec.SetField(trustcenter.FieldPirschDomainID, field.TypeString, value)
+	}
+	if _u.mutation.PirschDomainIDCleared() {
+		_spec.ClearField(trustcenter.FieldPirschDomainID, field.TypeString)
+	}
+	if value, ok := _u.mutation.PirschIdentificationCode(); ok {
+		_spec.SetField(trustcenter.FieldPirschIdentificationCode, field.TypeString, value)
+	}
+	if _u.mutation.PirschIdentificationCodeCleared() {
+		_spec.ClearField(trustcenter.FieldPirschIdentificationCode, field.TypeString)
 	}
 	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -839,6 +928,54 @@ func (_u *TrustCenterUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			},
 		}
 		edge.Schema = _u.schemaConfig.Template
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   trustcenter.PostsTable,
+			Columns: []string{trustcenter.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(note.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Note
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   trustcenter.PostsTable,
+			Columns: []string{trustcenter.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(note.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Note
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   trustcenter.PostsTable,
+			Columns: []string{trustcenter.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(note.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Note
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -1018,6 +1155,46 @@ func (_u *TrustCenterUpdateOne) ClearCustomDomainID() *TrustCenterUpdateOne {
 	return _u
 }
 
+// SetPirschDomainID sets the "pirsch_domain_id" field.
+func (_u *TrustCenterUpdateOne) SetPirschDomainID(v string) *TrustCenterUpdateOne {
+	_u.mutation.SetPirschDomainID(v)
+	return _u
+}
+
+// SetNillablePirschDomainID sets the "pirsch_domain_id" field if the given value is not nil.
+func (_u *TrustCenterUpdateOne) SetNillablePirschDomainID(v *string) *TrustCenterUpdateOne {
+	if v != nil {
+		_u.SetPirschDomainID(*v)
+	}
+	return _u
+}
+
+// ClearPirschDomainID clears the value of the "pirsch_domain_id" field.
+func (_u *TrustCenterUpdateOne) ClearPirschDomainID() *TrustCenterUpdateOne {
+	_u.mutation.ClearPirschDomainID()
+	return _u
+}
+
+// SetPirschIdentificationCode sets the "pirsch_identification_code" field.
+func (_u *TrustCenterUpdateOne) SetPirschIdentificationCode(v string) *TrustCenterUpdateOne {
+	_u.mutation.SetPirschIdentificationCode(v)
+	return _u
+}
+
+// SetNillablePirschIdentificationCode sets the "pirsch_identification_code" field if the given value is not nil.
+func (_u *TrustCenterUpdateOne) SetNillablePirschIdentificationCode(v *string) *TrustCenterUpdateOne {
+	if v != nil {
+		_u.SetPirschIdentificationCode(*v)
+	}
+	return _u
+}
+
+// ClearPirschIdentificationCode clears the value of the "pirsch_identification_code" field.
+func (_u *TrustCenterUpdateOne) ClearPirschIdentificationCode() *TrustCenterUpdateOne {
+	_u.mutation.ClearPirschIdentificationCode()
+	return _u
+}
+
 // SetOwner sets the "owner" edge to the Organization entity.
 func (_u *TrustCenterUpdateOne) SetOwner(v *Organization) *TrustCenterUpdateOne {
 	return _u.SetOwnerID(v.ID)
@@ -1124,6 +1301,21 @@ func (_u *TrustCenterUpdateOne) AddTemplates(v ...*Template) *TrustCenterUpdateO
 		ids[i] = v[i].ID
 	}
 	return _u.AddTemplateIDs(ids...)
+}
+
+// AddPostIDs adds the "posts" edge to the Note entity by IDs.
+func (_u *TrustCenterUpdateOne) AddPostIDs(ids ...string) *TrustCenterUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
+}
+
+// AddPosts adds the "posts" edges to the Note entity.
+func (_u *TrustCenterUpdateOne) AddPosts(v ...*Note) *TrustCenterUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPostIDs(ids...)
 }
 
 // Mutation returns the TrustCenterMutation object of the builder.
@@ -1237,6 +1429,27 @@ func (_u *TrustCenterUpdateOne) RemoveTemplates(v ...*Template) *TrustCenterUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveTemplateIDs(ids...)
+}
+
+// ClearPosts clears all "posts" edges to the Note entity.
+func (_u *TrustCenterUpdateOne) ClearPosts() *TrustCenterUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
+}
+
+// RemovePostIDs removes the "posts" edge to Note entities by IDs.
+func (_u *TrustCenterUpdateOne) RemovePostIDs(ids ...string) *TrustCenterUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
+}
+
+// RemovePosts removes "posts" edges to Note entities.
+func (_u *TrustCenterUpdateOne) RemovePosts(v ...*Note) *TrustCenterUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePostIDs(ids...)
 }
 
 // Where appends a list predicates to the TrustCenterUpdate builder.
@@ -1385,6 +1598,18 @@ func (_u *TrustCenterUpdateOne) sqlSave(ctx context.Context) (_node *TrustCenter
 	}
 	if _u.mutation.SlugCleared() {
 		_spec.ClearField(trustcenter.FieldSlug, field.TypeString)
+	}
+	if value, ok := _u.mutation.PirschDomainID(); ok {
+		_spec.SetField(trustcenter.FieldPirschDomainID, field.TypeString, value)
+	}
+	if _u.mutation.PirschDomainIDCleared() {
+		_spec.ClearField(trustcenter.FieldPirschDomainID, field.TypeString)
+	}
+	if value, ok := _u.mutation.PirschIdentificationCode(); ok {
+		_spec.SetField(trustcenter.FieldPirschIdentificationCode, field.TypeString, value)
+	}
+	if _u.mutation.PirschIdentificationCodeCleared() {
+		_spec.ClearField(trustcenter.FieldPirschIdentificationCode, field.TypeString)
 	}
 	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1697,6 +1922,54 @@ func (_u *TrustCenterUpdateOne) sqlSave(ctx context.Context) (_node *TrustCenter
 			},
 		}
 		edge.Schema = _u.schemaConfig.Template
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   trustcenter.PostsTable,
+			Columns: []string{trustcenter.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(note.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Note
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   trustcenter.PostsTable,
+			Columns: []string{trustcenter.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(note.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Note
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   trustcenter.PostsTable,
+			Columns: []string{trustcenter.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(note.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Note
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

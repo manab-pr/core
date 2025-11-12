@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stripe/stripe-go/v82"
+	"github.com/stripe/stripe-go/v83"
 
 	"github.com/theopenlane/core/pkg/entitlements"
 	"github.com/theopenlane/core/pkg/entitlements/mocks"
@@ -510,7 +510,7 @@ func TestCreateWebhookEndpoint(t *testing.T) {
 		Client: mockStripeClient,
 	}
 
-	webhook, err := service.CreateWebhookEndpoint(context.Background(), "https://example.com/webhook", entitlements.SupportedEventTypeStrings())
+	webhook, err := service.CreateWebhookEndpoint(context.Background(), "https://example.com/webhook", entitlements.SupportedEventTypeStrings(), stripe.APIVersion, false)
 	c.NoError(err)
 	c.Equal(expectedWebhook, webhook)
 }
@@ -541,7 +541,7 @@ func TestCreateWebhookEndpointDefaultEvents(t *testing.T) {
 		Client: mockStripeClient,
 	}
 
-	webhook, err := service.CreateWebhookEndpoint(context.Background(), "https://example.com/webhook", nil)
+	webhook, err := service.CreateWebhookEndpoint(context.Background(), "https://example.com/webhook", nil, "", false)
 	c.NoError(err)
 	c.Equal(expectedWebhook, webhook)
 }

@@ -6,10 +6,11 @@ import (
 	"entgo.io/ent/schema/field"
 
 	"github.com/gertd/go-pluralize"
-	"github.com/theopenlane/core/pkg/models"
 	"github.com/theopenlane/entx"
 	"github.com/theopenlane/iam/entfga"
 	"github.com/theopenlane/iam/fgax"
+
+	"github.com/theopenlane/core/pkg/models"
 
 	"github.com/theopenlane/core/internal/ent/generated"
 	"github.com/theopenlane/core/internal/ent/hooks"
@@ -79,6 +80,26 @@ func (n Note) Edges() []ent.Edge {
 			fromSchema: n,
 			edgeSchema: Subcontrol{},
 			ref:        "comments",
+		}),
+		uniqueEdgeFrom(&edgeDefinition{
+			fromSchema: n,
+			edgeSchema: Procedure{},
+			ref:        "comments",
+		}),
+		uniqueEdgeFrom(&edgeDefinition{
+			fromSchema: n,
+			edgeSchema: Risk{},
+			ref:        "comments",
+		}),
+		uniqueEdgeFrom(&edgeDefinition{
+			fromSchema: n,
+			edgeSchema: InternalPolicy{},
+			ref:        "comments",
+		}),
+		uniqueEdgeFrom(&edgeDefinition{
+			fromSchema: n,
+			edgeSchema: TrustCenter{},
+			ref:        "posts",
 		}),
 		defaultEdgeToWithPagination(n, File{}),
 	}

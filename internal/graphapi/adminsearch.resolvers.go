@@ -30,12 +30,15 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		errors                            []error
 		apitokenResults                   *generated.APITokenConnection
 		actionplanResults                 *generated.ActionPlanConnection
+		assessmentResults                 *generated.AssessmentConnection
+		assessmentresponseResults         *generated.AssessmentResponseConnection
 		assetResults                      *generated.AssetConnection
 		contactResults                    *generated.ContactConnection
 		controlResults                    *generated.ControlConnection
 		controlimplementationResults      *generated.ControlImplementationConnection
 		controlobjectiveResults           *generated.ControlObjectiveConnection
 		customdomainResults               *generated.CustomDomainConnection
+		customtypeenumResults             *generated.CustomTypeEnumConnection
 		dnsverificationResults            *generated.DNSVerificationConnection
 		documentdataResults               *generated.DocumentDataConnection
 		entityResults                     *generated.EntityConnection
@@ -43,6 +46,7 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		eventResults                      *generated.EventConnection
 		evidenceResults                   *generated.EvidenceConnection
 		fileResults                       *generated.FileConnection
+		findingResults                    *generated.FindingConnection
 		groupResults                      *generated.GroupConnection
 		integrationResults                *generated.IntegrationConnection
 		internalpolicyResults             *generated.InternalPolicyConnection
@@ -60,12 +64,15 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		personalaccesstokenResults        *generated.PersonalAccessTokenConnection
 		procedureResults                  *generated.ProcedureConnection
 		programResults                    *generated.ProgramConnection
+		remediationResults                *generated.RemediationConnection
+		reviewResults                     *generated.ReviewConnection
 		riskResults                       *generated.RiskConnection
 		scanResults                       *generated.ScanConnection
 		standardResults                   *generated.StandardConnection
 		subcontrolResults                 *generated.SubcontrolConnection
 		subprocessorResults               *generated.SubprocessorConnection
 		subscriberResults                 *generated.SubscriberConnection
+		tagdefinitionResults              *generated.TagDefinitionConnection
 		taskResults                       *generated.TaskConnection
 		templateResults                   *generated.TemplateConnection
 		trustcenterResults                *generated.TrustCenterConnection
@@ -73,425 +80,662 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		trustcenterdocResults             *generated.TrustCenterDocConnection
 		userResults                       *generated.UserConnection
 		usersettingResults                *generated.UserSettingConnection
+		vulnerabilityResults              *generated.VulnerabilityConnection
 		webauthnResults                   *generated.WebauthnConnection
 	)
 
 	highlightTracker := newContextTracker(query)
 
+	hasSearchContext := graphutils.CheckForRequestedField(ctx, "searchContext")
+
 	r.withPool().SubmitMultipleAndWait([]func(){
 		func() {
 			var err error
 			apitokenResults, err = searchAPITokens(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, apitokenResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, apitokenResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			actionplanResults, err = searchActionPlans(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, actionplanResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, actionplanResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			assessmentResults, err = searchAssessments(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, assessmentResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			assessmentresponseResults, err = searchAssessmentResponses(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, assessmentresponseResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			assetResults, err = searchAssets(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, assetResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, assetResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			contactResults, err = searchContacts(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, contactResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, contactResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			controlResults, err = searchControls(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, controlResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, controlResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			controlimplementationResults, err = searchControlImplementations(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, controlimplementationResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, controlimplementationResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			controlobjectiveResults, err = searchControlObjectives(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, controlobjectiveResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, controlobjectiveResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			customdomainResults, err = searchCustomDomains(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, customdomainResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, customdomainResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			customtypeenumResults, err = searchCustomTypeEnums(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, customtypeenumResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			dnsverificationResults, err = searchDNSVerifications(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, dnsverificationResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, dnsverificationResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			documentdataResults, err = searchDocumentData(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, documentdataResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, documentdataResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			entityResults, err = searchEntities(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, entityResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, entityResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			entitytypeResults, err = searchEntityTypes(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, entitytypeResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, entitytypeResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			eventResults, err = searchEvents(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, eventResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, eventResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			evidenceResults, err = searchEvidences(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, evidenceResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, evidenceResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			fileResults, err = searchFiles(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, fileResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, fileResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			findingResults, err = searchFindings(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, findingResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			groupResults, err = searchGroups(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, groupResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, groupResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			integrationResults, err = searchIntegrations(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, integrationResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, integrationResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			internalpolicyResults, err = searchInternalPolicies(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, internalpolicyResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, internalpolicyResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			inviteResults, err = searchInvites(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, inviteResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, inviteResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			jobrunnerResults, err = searchJobRunners(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, jobrunnerResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, jobrunnerResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			jobrunnerregistrationtokenResults, err = searchJobRunnerRegistrationTokens(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, jobrunnerregistrationtokenResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, jobrunnerregistrationtokenResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			jobrunnertokenResults, err = searchJobRunnerTokens(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, jobrunnertokenResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, jobrunnertokenResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			jobtemplateResults, err = searchJobTemplates(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, jobtemplateResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, jobtemplateResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			mappabledomainResults, err = searchMappableDomains(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, mappabledomainResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, mappabledomainResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			mappedcontrolResults, err = searchMappedControls(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, mappedcontrolResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, mappedcontrolResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			narrativeResults, err = searchNarratives(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, narrativeResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, narrativeResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			orgsubscriptionResults, err = searchOrgSubscriptions(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, orgsubscriptionResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, orgsubscriptionResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			organizationResults, err = searchOrganizations(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, organizationResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, organizationResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			organizationsettingResults, err = searchOrganizationSettings(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, organizationsettingResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, organizationsettingResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			personalaccesstokenResults, err = searchPersonalAccessTokens(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, personalaccesstokenResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, personalaccesstokenResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			procedureResults, err = searchProcedures(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, procedureResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, procedureResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			programResults, err = searchPrograms(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, programResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, programResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			remediationResults, err = searchRemediations(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, remediationResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			reviewResults, err = searchReviews(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, reviewResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			riskResults, err = searchRisks(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, riskResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, riskResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			scanResults, err = searchScans(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, scanResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, scanResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			standardResults, err = searchStandards(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, standardResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, standardResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			subcontrolResults, err = searchSubcontrols(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, subcontrolResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, subcontrolResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			subprocessorResults, err = searchSubprocessors(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, subprocessorResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, subprocessorResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			subscriberResults, err = searchSubscribers(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, subscriberResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, subscriberResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			tagdefinitionResults, err = searchTagDefinitions(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, tagdefinitionResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			taskResults, err = searchTasks(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, taskResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, taskResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			templateResults, err = searchTemplates(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, templateResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, templateResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			trustcenterResults, err = searchTrustCenters(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, trustcenterResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, trustcenterResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			trustcentercomplianceResults, err = searchTrustCenterCompliances(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, trustcentercomplianceResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, trustcentercomplianceResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			trustcenterdocResults, err = searchTrustCenterDocs(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, trustcenterdocResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, trustcenterdocResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			userResults, err = searchUsers(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, userResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, userResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			usersettingResults, err = searchUserSettings(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, usersettingResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, usersettingResults, highlightTracker)
+			}
+		},
+		func() {
+			var err error
+			vulnerabilityResults, err = searchVulnerabilities(ctx, query, after, first, before, last)
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
+				errors = append(errors, err)
+			}
+
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, vulnerabilityResults, highlightTracker)
+			}
 		},
 		func() {
 			var err error
 			webauthnResults, err = searchWebauthns(ctx, query, after, first, before, last)
-			if err != nil {
+			// ignore not found errors
+			if err != nil && !generated.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 
-			highlightSearchContext(ctx, query, webauthnResults, highlightTracker)
+			if hasSearchContext {
+				highlightSearchContext(ctx, query, webauthnResults, highlightTracker)
+			}
 		},
 	})
 
@@ -514,6 +758,16 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		res.ActionPlans = actionplanResults
 
 		res.TotalCount += actionplanResults.TotalCount
+	}
+	if assessmentResults != nil && len(assessmentResults.Edges) > 0 {
+		res.Assessments = assessmentResults
+
+		res.TotalCount += assessmentResults.TotalCount
+	}
+	if assessmentresponseResults != nil && len(assessmentresponseResults.Edges) > 0 {
+		res.AssessmentResponses = assessmentresponseResults
+
+		res.TotalCount += assessmentresponseResults.TotalCount
 	}
 	if assetResults != nil && len(assetResults.Edges) > 0 {
 		res.Assets = assetResults
@@ -544,6 +798,11 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		res.CustomDomains = customdomainResults
 
 		res.TotalCount += customdomainResults.TotalCount
+	}
+	if customtypeenumResults != nil && len(customtypeenumResults.Edges) > 0 {
+		res.CustomTypeEnums = customtypeenumResults
+
+		res.TotalCount += customtypeenumResults.TotalCount
 	}
 	if dnsverificationResults != nil && len(dnsverificationResults.Edges) > 0 {
 		res.DNSVerifications = dnsverificationResults
@@ -579,6 +838,11 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		res.Files = fileResults
 
 		res.TotalCount += fileResults.TotalCount
+	}
+	if findingResults != nil && len(findingResults.Edges) > 0 {
+		res.Findings = findingResults
+
+		res.TotalCount += findingResults.TotalCount
 	}
 	if groupResults != nil && len(groupResults.Edges) > 0 {
 		res.Groups = groupResults
@@ -665,6 +929,16 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 
 		res.TotalCount += programResults.TotalCount
 	}
+	if remediationResults != nil && len(remediationResults.Edges) > 0 {
+		res.Remediations = remediationResults
+
+		res.TotalCount += remediationResults.TotalCount
+	}
+	if reviewResults != nil && len(reviewResults.Edges) > 0 {
+		res.Reviews = reviewResults
+
+		res.TotalCount += reviewResults.TotalCount
+	}
 	if riskResults != nil && len(riskResults.Edges) > 0 {
 		res.Risks = riskResults
 
@@ -694,6 +968,11 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		res.Subscribers = subscriberResults
 
 		res.TotalCount += subscriberResults.TotalCount
+	}
+	if tagdefinitionResults != nil && len(tagdefinitionResults.Edges) > 0 {
+		res.TagDefinitions = tagdefinitionResults
+
+		res.TotalCount += tagdefinitionResults.TotalCount
 	}
 	if taskResults != nil && len(taskResults.Edges) > 0 {
 		res.Tasks = taskResults
@@ -729,6 +1008,11 @@ func (r *queryResolver) AdminSearch(ctx context.Context, query string, after *en
 		res.UserSettings = usersettingResults
 
 		res.TotalCount += usersettingResults.TotalCount
+	}
+	if vulnerabilityResults != nil && len(vulnerabilityResults.Edges) > 0 {
+		res.Vulnerabilities = vulnerabilityResults
+
+		res.TotalCount += vulnerabilityResults.TotalCount
 	}
 	if webauthnResults != nil && len(webauthnResults.Edges) > 0 {
 		res.Webauthns = webauthnResults
@@ -773,6 +1057,42 @@ func (r *queryResolver) AdminActionPlanSearch(ctx context.Context, query string,
 
 	// return the results
 	return actionplanResults, nil
+}
+func (r *queryResolver) AdminAssessmentSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.AssessmentConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	assessmentResults, err := adminSearchAssessments(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return assessmentResults, nil
+}
+func (r *queryResolver) AdminAssessmentResponseSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.AssessmentResponseConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	assessmentresponseResults, err := adminSearchAssessmentResponses(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return assessmentresponseResults, nil
 }
 func (r *queryResolver) AdminAssetSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.AssetConnection, error) {
 	// ensure the user is a system admin
@@ -881,6 +1201,24 @@ func (r *queryResolver) AdminCustomDomainSearch(ctx context.Context, query strin
 
 	// return the results
 	return customdomainResults, nil
+}
+func (r *queryResolver) AdminCustomTypeEnumSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.CustomTypeEnumConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	customtypeenumResults, err := adminSearchCustomTypeEnums(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return customtypeenumResults, nil
 }
 func (r *queryResolver) AdminDNSVerificationSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.DNSVerificationConnection, error) {
 	// ensure the user is a system admin
@@ -1007,6 +1345,24 @@ func (r *queryResolver) AdminFileSearch(ctx context.Context, query string, after
 
 	// return the results
 	return fileResults, nil
+}
+func (r *queryResolver) AdminFindingSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.FindingConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	findingResults, err := adminSearchFindings(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return findingResults, nil
 }
 func (r *queryResolver) AdminGroupSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.GroupConnection, error) {
 	// ensure the user is a system admin
@@ -1314,6 +1670,42 @@ func (r *queryResolver) AdminProgramSearch(ctx context.Context, query string, af
 	// return the results
 	return programResults, nil
 }
+func (r *queryResolver) AdminRemediationSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.RemediationConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	remediationResults, err := adminSearchRemediations(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return remediationResults, nil
+}
+func (r *queryResolver) AdminReviewSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.ReviewConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	reviewResults, err := adminSearchReviews(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return reviewResults, nil
+}
 func (r *queryResolver) AdminRiskSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.RiskConnection, error) {
 	// ensure the user is a system admin
 	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
@@ -1421,6 +1813,24 @@ func (r *queryResolver) AdminSubscriberSearch(ctx context.Context, query string,
 
 	// return the results
 	return subscriberResults, nil
+}
+func (r *queryResolver) AdminTagDefinitionSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.TagDefinitionConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	tagdefinitionResults, err := adminSearchTagDefinitions(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return tagdefinitionResults, nil
 }
 func (r *queryResolver) AdminTaskSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.TaskConnection, error) {
 	// ensure the user is a system admin
@@ -1547,6 +1957,24 @@ func (r *queryResolver) AdminUserSettingSearch(ctx context.Context, query string
 
 	// return the results
 	return usersettingResults, nil
+}
+func (r *queryResolver) AdminVulnerabilitySearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.VulnerabilityConnection, error) {
+	// ensure the user is a system admin
+	isAdmin, err := rule.CheckIsSystemAdminWithContext(ctx)
+	if err != nil || !isAdmin {
+		return nil, generated.ErrPermissionDenied
+	}
+
+	first, last = graphutils.SetFirstLastDefaults(first, last, r.maxResultLimit)
+
+	vulnerabilityResults, err := adminSearchVulnerabilities(ctx, query, after, first, before, last)
+
+	if err != nil {
+		return nil, ErrSearchFailed
+	}
+
+	// return the results
+	return vulnerabilityResults, nil
 }
 func (r *queryResolver) AdminWebauthnSearch(ctx context.Context, query string, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int) (*generated.WebauthnConnection, error) {
 	// ensure the user is a system admin

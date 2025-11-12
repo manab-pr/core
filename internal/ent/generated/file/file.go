@@ -226,8 +226,12 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"export_files",
+	"finding_files",
 	"integration_files",
 	"note_files",
+	"remediation_files",
+	"review_files",
+	"vulnerability_files",
 }
 
 var (
@@ -299,7 +303,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [6]ent.Hook
+	Hooks        [7]ent.Hook
 	Interceptors [5]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

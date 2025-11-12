@@ -368,6 +368,106 @@ func (_u *UserUpdate) ClearRole() *UserUpdate {
 	return _u
 }
 
+// SetScimExternalID sets the "scim_external_id" field.
+func (_u *UserUpdate) SetScimExternalID(v string) *UserUpdate {
+	_u.mutation.SetScimExternalID(v)
+	return _u
+}
+
+// SetNillableScimExternalID sets the "scim_external_id" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableScimExternalID(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetScimExternalID(*v)
+	}
+	return _u
+}
+
+// ClearScimExternalID clears the value of the "scim_external_id" field.
+func (_u *UserUpdate) ClearScimExternalID() *UserUpdate {
+	_u.mutation.ClearScimExternalID()
+	return _u
+}
+
+// SetScimUsername sets the "scim_username" field.
+func (_u *UserUpdate) SetScimUsername(v string) *UserUpdate {
+	_u.mutation.SetScimUsername(v)
+	return _u
+}
+
+// SetNillableScimUsername sets the "scim_username" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableScimUsername(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetScimUsername(*v)
+	}
+	return _u
+}
+
+// ClearScimUsername clears the value of the "scim_username" field.
+func (_u *UserUpdate) ClearScimUsername() *UserUpdate {
+	_u.mutation.ClearScimUsername()
+	return _u
+}
+
+// SetScimActive sets the "scim_active" field.
+func (_u *UserUpdate) SetScimActive(v bool) *UserUpdate {
+	_u.mutation.SetScimActive(v)
+	return _u
+}
+
+// SetNillableScimActive sets the "scim_active" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableScimActive(v *bool) *UserUpdate {
+	if v != nil {
+		_u.SetScimActive(*v)
+	}
+	return _u
+}
+
+// ClearScimActive clears the value of the "scim_active" field.
+func (_u *UserUpdate) ClearScimActive() *UserUpdate {
+	_u.mutation.ClearScimActive()
+	return _u
+}
+
+// SetScimPreferredLanguage sets the "scim_preferred_language" field.
+func (_u *UserUpdate) SetScimPreferredLanguage(v string) *UserUpdate {
+	_u.mutation.SetScimPreferredLanguage(v)
+	return _u
+}
+
+// SetNillableScimPreferredLanguage sets the "scim_preferred_language" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableScimPreferredLanguage(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetScimPreferredLanguage(*v)
+	}
+	return _u
+}
+
+// ClearScimPreferredLanguage clears the value of the "scim_preferred_language" field.
+func (_u *UserUpdate) ClearScimPreferredLanguage() *UserUpdate {
+	_u.mutation.ClearScimPreferredLanguage()
+	return _u
+}
+
+// SetScimLocale sets the "scim_locale" field.
+func (_u *UserUpdate) SetScimLocale(v string) *UserUpdate {
+	_u.mutation.SetScimLocale(v)
+	return _u
+}
+
+// SetNillableScimLocale sets the "scim_locale" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableScimLocale(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetScimLocale(*v)
+	}
+	return _u
+}
+
+// ClearScimLocale clears the value of the "scim_locale" field.
+func (_u *UserUpdate) ClearScimLocale() *UserUpdate {
+	_u.mutation.ClearScimLocale()
+	return _u
+}
+
 // AddPersonalAccessTokenIDs adds the "personal_access_tokens" edge to the PersonalAccessToken entity by IDs.
 func (_u *UserUpdate) AddPersonalAccessTokenIDs(ids ...string) *UserUpdate {
 	_u.mutation.AddPersonalAccessTokenIDs(ids...)
@@ -623,23 +723,19 @@ func (_u *UserUpdate) AddPrograms(v ...*Program) *UserUpdate {
 	return _u.AddProgramIDs(ids...)
 }
 
-// SetProgramOwnerID sets the "program_owner" edge to the Program entity by ID.
-func (_u *UserUpdate) SetProgramOwnerID(id string) *UserUpdate {
-	_u.mutation.SetProgramOwnerID(id)
+// AddProgramsOwnedIDs adds the "programs_owned" edge to the Program entity by IDs.
+func (_u *UserUpdate) AddProgramsOwnedIDs(ids ...string) *UserUpdate {
+	_u.mutation.AddProgramsOwnedIDs(ids...)
 	return _u
 }
 
-// SetNillableProgramOwnerID sets the "program_owner" edge to the Program entity by ID if the given value is not nil.
-func (_u *UserUpdate) SetNillableProgramOwnerID(id *string) *UserUpdate {
-	if id != nil {
-		_u = _u.SetProgramOwnerID(*id)
+// AddProgramsOwned adds the "programs_owned" edges to the Program entity.
+func (_u *UserUpdate) AddProgramsOwned(v ...*Program) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return _u
-}
-
-// SetProgramOwner sets the "program_owner" edge to the Program entity.
-func (_u *UserUpdate) SetProgramOwner(v *Program) *UserUpdate {
-	return _u.SetProgramOwnerID(v.ID)
+	return _u.AddProgramsOwnedIDs(ids...)
 }
 
 // AddImpersonationEventIDs adds the "impersonation_events" edge to the ImpersonationEvent entity by IDs.
@@ -1049,10 +1145,25 @@ func (_u *UserUpdate) RemovePrograms(v ...*Program) *UserUpdate {
 	return _u.RemoveProgramIDs(ids...)
 }
 
-// ClearProgramOwner clears the "program_owner" edge to the Program entity.
-func (_u *UserUpdate) ClearProgramOwner() *UserUpdate {
-	_u.mutation.ClearProgramOwner()
+// ClearProgramsOwned clears all "programs_owned" edges to the Program entity.
+func (_u *UserUpdate) ClearProgramsOwned() *UserUpdate {
+	_u.mutation.ClearProgramsOwned()
 	return _u
+}
+
+// RemoveProgramsOwnedIDs removes the "programs_owned" edge to Program entities by IDs.
+func (_u *UserUpdate) RemoveProgramsOwnedIDs(ids ...string) *UserUpdate {
+	_u.mutation.RemoveProgramsOwnedIDs(ids...)
+	return _u
+}
+
+// RemoveProgramsOwned removes "programs_owned" edges to Program entities.
+func (_u *UserUpdate) RemoveProgramsOwned(v ...*Program) *UserUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveProgramsOwnedIDs(ids...)
 }
 
 // ClearImpersonationEvents clears all "impersonation_events" edges to the ImpersonationEvent entity.
@@ -1385,6 +1496,36 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.RoleCleared() {
 		_spec.ClearField(user.FieldRole, field.TypeEnum)
+	}
+	if value, ok := _u.mutation.ScimExternalID(); ok {
+		_spec.SetField(user.FieldScimExternalID, field.TypeString, value)
+	}
+	if _u.mutation.ScimExternalIDCleared() {
+		_spec.ClearField(user.FieldScimExternalID, field.TypeString)
+	}
+	if value, ok := _u.mutation.ScimUsername(); ok {
+		_spec.SetField(user.FieldScimUsername, field.TypeString, value)
+	}
+	if _u.mutation.ScimUsernameCleared() {
+		_spec.ClearField(user.FieldScimUsername, field.TypeString)
+	}
+	if value, ok := _u.mutation.ScimActive(); ok {
+		_spec.SetField(user.FieldScimActive, field.TypeBool, value)
+	}
+	if _u.mutation.ScimActiveCleared() {
+		_spec.ClearField(user.FieldScimActive, field.TypeBool)
+	}
+	if value, ok := _u.mutation.ScimPreferredLanguage(); ok {
+		_spec.SetField(user.FieldScimPreferredLanguage, field.TypeString, value)
+	}
+	if _u.mutation.ScimPreferredLanguageCleared() {
+		_spec.ClearField(user.FieldScimPreferredLanguage, field.TypeString)
+	}
+	if value, ok := _u.mutation.ScimLocale(); ok {
+		_spec.SetField(user.FieldScimLocale, field.TypeString, value)
+	}
+	if _u.mutation.ScimLocaleCleared() {
+		_spec.ClearField(user.FieldScimLocale, field.TypeString)
 	}
 	if _u.mutation.PersonalAccessTokensCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -2231,12 +2372,12 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.ProgramOwnerCleared() {
+	if _u.mutation.ProgramsOwnedCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ProgramOwnerTable,
-			Columns: []string{user.ProgramOwnerColumn},
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),
@@ -2245,12 +2386,29 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		edge.Schema = _u.schemaConfig.Program
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.ProgramOwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedProgramsOwnedIDs(); len(nodes) > 0 && !_u.mutation.ProgramsOwnedCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ProgramOwnerTable,
-			Columns: []string{user.ProgramOwnerColumn},
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Program
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ProgramsOwnedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),
@@ -2842,6 +3000,106 @@ func (_u *UserUpdateOne) ClearRole() *UserUpdateOne {
 	return _u
 }
 
+// SetScimExternalID sets the "scim_external_id" field.
+func (_u *UserUpdateOne) SetScimExternalID(v string) *UserUpdateOne {
+	_u.mutation.SetScimExternalID(v)
+	return _u
+}
+
+// SetNillableScimExternalID sets the "scim_external_id" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableScimExternalID(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetScimExternalID(*v)
+	}
+	return _u
+}
+
+// ClearScimExternalID clears the value of the "scim_external_id" field.
+func (_u *UserUpdateOne) ClearScimExternalID() *UserUpdateOne {
+	_u.mutation.ClearScimExternalID()
+	return _u
+}
+
+// SetScimUsername sets the "scim_username" field.
+func (_u *UserUpdateOne) SetScimUsername(v string) *UserUpdateOne {
+	_u.mutation.SetScimUsername(v)
+	return _u
+}
+
+// SetNillableScimUsername sets the "scim_username" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableScimUsername(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetScimUsername(*v)
+	}
+	return _u
+}
+
+// ClearScimUsername clears the value of the "scim_username" field.
+func (_u *UserUpdateOne) ClearScimUsername() *UserUpdateOne {
+	_u.mutation.ClearScimUsername()
+	return _u
+}
+
+// SetScimActive sets the "scim_active" field.
+func (_u *UserUpdateOne) SetScimActive(v bool) *UserUpdateOne {
+	_u.mutation.SetScimActive(v)
+	return _u
+}
+
+// SetNillableScimActive sets the "scim_active" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableScimActive(v *bool) *UserUpdateOne {
+	if v != nil {
+		_u.SetScimActive(*v)
+	}
+	return _u
+}
+
+// ClearScimActive clears the value of the "scim_active" field.
+func (_u *UserUpdateOne) ClearScimActive() *UserUpdateOne {
+	_u.mutation.ClearScimActive()
+	return _u
+}
+
+// SetScimPreferredLanguage sets the "scim_preferred_language" field.
+func (_u *UserUpdateOne) SetScimPreferredLanguage(v string) *UserUpdateOne {
+	_u.mutation.SetScimPreferredLanguage(v)
+	return _u
+}
+
+// SetNillableScimPreferredLanguage sets the "scim_preferred_language" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableScimPreferredLanguage(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetScimPreferredLanguage(*v)
+	}
+	return _u
+}
+
+// ClearScimPreferredLanguage clears the value of the "scim_preferred_language" field.
+func (_u *UserUpdateOne) ClearScimPreferredLanguage() *UserUpdateOne {
+	_u.mutation.ClearScimPreferredLanguage()
+	return _u
+}
+
+// SetScimLocale sets the "scim_locale" field.
+func (_u *UserUpdateOne) SetScimLocale(v string) *UserUpdateOne {
+	_u.mutation.SetScimLocale(v)
+	return _u
+}
+
+// SetNillableScimLocale sets the "scim_locale" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableScimLocale(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetScimLocale(*v)
+	}
+	return _u
+}
+
+// ClearScimLocale clears the value of the "scim_locale" field.
+func (_u *UserUpdateOne) ClearScimLocale() *UserUpdateOne {
+	_u.mutation.ClearScimLocale()
+	return _u
+}
+
 // AddPersonalAccessTokenIDs adds the "personal_access_tokens" edge to the PersonalAccessToken entity by IDs.
 func (_u *UserUpdateOne) AddPersonalAccessTokenIDs(ids ...string) *UserUpdateOne {
 	_u.mutation.AddPersonalAccessTokenIDs(ids...)
@@ -3097,23 +3355,19 @@ func (_u *UserUpdateOne) AddPrograms(v ...*Program) *UserUpdateOne {
 	return _u.AddProgramIDs(ids...)
 }
 
-// SetProgramOwnerID sets the "program_owner" edge to the Program entity by ID.
-func (_u *UserUpdateOne) SetProgramOwnerID(id string) *UserUpdateOne {
-	_u.mutation.SetProgramOwnerID(id)
+// AddProgramsOwnedIDs adds the "programs_owned" edge to the Program entity by IDs.
+func (_u *UserUpdateOne) AddProgramsOwnedIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.AddProgramsOwnedIDs(ids...)
 	return _u
 }
 
-// SetNillableProgramOwnerID sets the "program_owner" edge to the Program entity by ID if the given value is not nil.
-func (_u *UserUpdateOne) SetNillableProgramOwnerID(id *string) *UserUpdateOne {
-	if id != nil {
-		_u = _u.SetProgramOwnerID(*id)
+// AddProgramsOwned adds the "programs_owned" edges to the Program entity.
+func (_u *UserUpdateOne) AddProgramsOwned(v ...*Program) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return _u
-}
-
-// SetProgramOwner sets the "program_owner" edge to the Program entity.
-func (_u *UserUpdateOne) SetProgramOwner(v *Program) *UserUpdateOne {
-	return _u.SetProgramOwnerID(v.ID)
+	return _u.AddProgramsOwnedIDs(ids...)
 }
 
 // AddImpersonationEventIDs adds the "impersonation_events" edge to the ImpersonationEvent entity by IDs.
@@ -3523,10 +3777,25 @@ func (_u *UserUpdateOne) RemovePrograms(v ...*Program) *UserUpdateOne {
 	return _u.RemoveProgramIDs(ids...)
 }
 
-// ClearProgramOwner clears the "program_owner" edge to the Program entity.
-func (_u *UserUpdateOne) ClearProgramOwner() *UserUpdateOne {
-	_u.mutation.ClearProgramOwner()
+// ClearProgramsOwned clears all "programs_owned" edges to the Program entity.
+func (_u *UserUpdateOne) ClearProgramsOwned() *UserUpdateOne {
+	_u.mutation.ClearProgramsOwned()
 	return _u
+}
+
+// RemoveProgramsOwnedIDs removes the "programs_owned" edge to Program entities by IDs.
+func (_u *UserUpdateOne) RemoveProgramsOwnedIDs(ids ...string) *UserUpdateOne {
+	_u.mutation.RemoveProgramsOwnedIDs(ids...)
+	return _u
+}
+
+// RemoveProgramsOwned removes "programs_owned" edges to Program entities.
+func (_u *UserUpdateOne) RemoveProgramsOwned(v ...*Program) *UserUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveProgramsOwnedIDs(ids...)
 }
 
 // ClearImpersonationEvents clears all "impersonation_events" edges to the ImpersonationEvent entity.
@@ -3889,6 +4158,36 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if _u.mutation.RoleCleared() {
 		_spec.ClearField(user.FieldRole, field.TypeEnum)
+	}
+	if value, ok := _u.mutation.ScimExternalID(); ok {
+		_spec.SetField(user.FieldScimExternalID, field.TypeString, value)
+	}
+	if _u.mutation.ScimExternalIDCleared() {
+		_spec.ClearField(user.FieldScimExternalID, field.TypeString)
+	}
+	if value, ok := _u.mutation.ScimUsername(); ok {
+		_spec.SetField(user.FieldScimUsername, field.TypeString, value)
+	}
+	if _u.mutation.ScimUsernameCleared() {
+		_spec.ClearField(user.FieldScimUsername, field.TypeString)
+	}
+	if value, ok := _u.mutation.ScimActive(); ok {
+		_spec.SetField(user.FieldScimActive, field.TypeBool, value)
+	}
+	if _u.mutation.ScimActiveCleared() {
+		_spec.ClearField(user.FieldScimActive, field.TypeBool)
+	}
+	if value, ok := _u.mutation.ScimPreferredLanguage(); ok {
+		_spec.SetField(user.FieldScimPreferredLanguage, field.TypeString, value)
+	}
+	if _u.mutation.ScimPreferredLanguageCleared() {
+		_spec.ClearField(user.FieldScimPreferredLanguage, field.TypeString)
+	}
+	if value, ok := _u.mutation.ScimLocale(); ok {
+		_spec.SetField(user.FieldScimLocale, field.TypeString, value)
+	}
+	if _u.mutation.ScimLocaleCleared() {
+		_spec.ClearField(user.FieldScimLocale, field.TypeString)
 	}
 	if _u.mutation.PersonalAccessTokensCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -4735,12 +5034,12 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.ProgramOwnerCleared() {
+	if _u.mutation.ProgramsOwnedCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ProgramOwnerTable,
-			Columns: []string{user.ProgramOwnerColumn},
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),
@@ -4749,12 +5048,29 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 		edge.Schema = _u.schemaConfig.Program
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.ProgramOwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedProgramsOwnedIDs(); len(nodes) > 0 && !_u.mutation.ProgramsOwnedCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ProgramOwnerTable,
-			Columns: []string{user.ProgramOwnerColumn},
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Program
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ProgramsOwnedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),

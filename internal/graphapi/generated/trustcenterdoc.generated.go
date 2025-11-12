@@ -93,6 +93,129 @@ func (ec *executionContext) fieldContext_TrustCenterDocBulkCreatePayload_trustCe
 	return fc, nil
 }
 
+func (ec *executionContext) _TrustCenterDocBulkDeletePayload_deletedIDs(ctx context.Context, field graphql.CollectedField, obj *model.TrustCenterDocBulkDeletePayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TrustCenterDocBulkDeletePayload_deletedIDs,
+		func(ctx context.Context) (any, error) {
+			return obj.DeletedIDs, nil
+		},
+		nil,
+		ec.marshalNID2ᚕstringᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterDocBulkDeletePayload_deletedIDs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterDocBulkDeletePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterDocBulkUpdatePayload_trustCenterDocs(ctx context.Context, field graphql.CollectedField, obj *model.TrustCenterDocBulkUpdatePayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TrustCenterDocBulkUpdatePayload_trustCenterDocs,
+		func(ctx context.Context) (any, error) {
+			return obj.TrustCenterDocs, nil
+		},
+		nil,
+		ec.marshalOTrustCenterDoc2ᚕᚖgithubᚗcomᚋtheopenlaneᚋcoreᚋinternalᚋentᚋgeneratedᚐTrustCenterDocᚄ,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterDocBulkUpdatePayload_trustCenterDocs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterDocBulkUpdatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TrustCenterDoc_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_TrustCenterDoc_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_TrustCenterDoc_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_TrustCenterDoc_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_TrustCenterDoc_updatedBy(ctx, field)
+			case "tags":
+				return ec.fieldContext_TrustCenterDoc_tags(ctx, field)
+			case "trustCenterID":
+				return ec.fieldContext_TrustCenterDoc_trustCenterID(ctx, field)
+			case "title":
+				return ec.fieldContext_TrustCenterDoc_title(ctx, field)
+			case "category":
+				return ec.fieldContext_TrustCenterDoc_category(ctx, field)
+			case "fileID":
+				return ec.fieldContext_TrustCenterDoc_fileID(ctx, field)
+			case "originalFileID":
+				return ec.fieldContext_TrustCenterDoc_originalFileID(ctx, field)
+			case "watermarkingEnabled":
+				return ec.fieldContext_TrustCenterDoc_watermarkingEnabled(ctx, field)
+			case "watermarkStatus":
+				return ec.fieldContext_TrustCenterDoc_watermarkStatus(ctx, field)
+			case "visibility":
+				return ec.fieldContext_TrustCenterDoc_visibility(ctx, field)
+			case "trustCenter":
+				return ec.fieldContext_TrustCenterDoc_trustCenter(ctx, field)
+			case "file":
+				return ec.fieldContext_TrustCenterDoc_file(ctx, field)
+			case "originalFile":
+				return ec.fieldContext_TrustCenterDoc_originalFile(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TrustCenterDoc", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TrustCenterDocBulkUpdatePayload_updatedIDs(ctx context.Context, field graphql.CollectedField, obj *model.TrustCenterDocBulkUpdatePayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TrustCenterDocBulkUpdatePayload_updatedIDs,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedIDs, nil
+		},
+		nil,
+		ec.marshalOID2ᚕstringᚄ,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_TrustCenterDocBulkUpdatePayload_updatedIDs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TrustCenterDocBulkUpdatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TrustCenterDocCreatePayload_trustCenterDoc(ctx context.Context, field graphql.CollectedField, obj *model.TrustCenterDocCreatePayload) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -300,6 +423,83 @@ func (ec *executionContext) _TrustCenterDocBulkCreatePayload(ctx context.Context
 	return out
 }
 
+var trustCenterDocBulkDeletePayloadImplementors = []string{"TrustCenterDocBulkDeletePayload"}
+
+func (ec *executionContext) _TrustCenterDocBulkDeletePayload(ctx context.Context, sel ast.SelectionSet, obj *model.TrustCenterDocBulkDeletePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterDocBulkDeletePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterDocBulkDeletePayload")
+		case "deletedIDs":
+			out.Values[i] = ec._TrustCenterDocBulkDeletePayload_deletedIDs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var trustCenterDocBulkUpdatePayloadImplementors = []string{"TrustCenterDocBulkUpdatePayload"}
+
+func (ec *executionContext) _TrustCenterDocBulkUpdatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.TrustCenterDocBulkUpdatePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trustCenterDocBulkUpdatePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrustCenterDocBulkUpdatePayload")
+		case "trustCenterDocs":
+			out.Values[i] = ec._TrustCenterDocBulkUpdatePayload_trustCenterDocs(ctx, field, obj)
+		case "updatedIDs":
+			out.Values[i] = ec._TrustCenterDocBulkUpdatePayload_updatedIDs(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var trustCenterDocCreatePayloadImplementors = []string{"TrustCenterDocCreatePayload"}
 
 func (ec *executionContext) _TrustCenterDocCreatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.TrustCenterDocCreatePayload) graphql.Marshaler {
@@ -433,6 +633,34 @@ func (ec *executionContext) marshalNTrustCenterDocBulkCreatePayload2ᚖgithubᚗ
 		return graphql.Null
 	}
 	return ec._TrustCenterDocBulkCreatePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTrustCenterDocBulkDeletePayload2githubᚗcomᚋtheopenlaneᚋcoreᚋinternalᚋgraphapiᚋmodelᚐTrustCenterDocBulkDeletePayload(ctx context.Context, sel ast.SelectionSet, v model.TrustCenterDocBulkDeletePayload) graphql.Marshaler {
+	return ec._TrustCenterDocBulkDeletePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTrustCenterDocBulkDeletePayload2ᚖgithubᚗcomᚋtheopenlaneᚋcoreᚋinternalᚋgraphapiᚋmodelᚐTrustCenterDocBulkDeletePayload(ctx context.Context, sel ast.SelectionSet, v *model.TrustCenterDocBulkDeletePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterDocBulkDeletePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTrustCenterDocBulkUpdatePayload2githubᚗcomᚋtheopenlaneᚋcoreᚋinternalᚋgraphapiᚋmodelᚐTrustCenterDocBulkUpdatePayload(ctx context.Context, sel ast.SelectionSet, v model.TrustCenterDocBulkUpdatePayload) graphql.Marshaler {
+	return ec._TrustCenterDocBulkUpdatePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTrustCenterDocBulkUpdatePayload2ᚖgithubᚗcomᚋtheopenlaneᚋcoreᚋinternalᚋgraphapiᚋmodelᚐTrustCenterDocBulkUpdatePayload(ctx context.Context, sel ast.SelectionSet, v *model.TrustCenterDocBulkUpdatePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrustCenterDocBulkUpdatePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTrustCenterDocCreatePayload2githubᚗcomᚋtheopenlaneᚋcoreᚋinternalᚋgraphapiᚋmodelᚐTrustCenterDocCreatePayload(ctx context.Context, sel ast.SelectionSet, v model.TrustCenterDocCreatePayload) graphql.Marshaler {

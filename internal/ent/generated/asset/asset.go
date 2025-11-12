@@ -141,7 +141,11 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "assets"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"finding_assets",
+	"remediation_assets",
+	"review_assets",
 	"risk_assets",
+	"vulnerability_assets",
 }
 
 var (
@@ -177,7 +181,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [9]ent.Hook
+	Hooks        [10]ent.Hook
 	Interceptors [3]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

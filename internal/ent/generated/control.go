@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/theopenlane/core/internal/ent/generated/control"
+	"github.com/theopenlane/core/internal/ent/generated/customtypeenum"
 	"github.com/theopenlane/core/internal/ent/generated/entity"
 	"github.com/theopenlane/core/internal/ent/generated/group"
 	"github.com/theopenlane/core/internal/ent/generated/organization"
@@ -94,14 +95,22 @@ type Control struct {
 	InternalNotes *string `json:"internal_notes,omitempty"`
 	// an internal identifier for the mapping, this field is only available to system admins
 	SystemInternalID *string `json:"system_internal_id,omitempty"`
+	// the kind of the control
+	ControlKindName string `json:"control_kind_name,omitempty"`
+	// the kind of the control
+	ControlKindID string `json:"control_kind_id,omitempty"`
 	// the unique reference code for the control
 	RefCode string `json:"ref_code,omitempty"`
 	// the id of the standard that the control belongs to, if applicable
 	StandardID string `json:"standard_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ControlQuery when eager-loading is set.
-	Edges        ControlEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                     ControlEdges `json:"edges"`
+	custom_type_enum_controls *string
+	remediation_controls      *string
+	review_controls           *string
+	vulnerability_controls    *string
+	selectValues              sql.SelectValues
 }
 
 // ControlEdges holds the relations/edges for other nodes in the graph.
@@ -136,6 +145,8 @@ type ControlEdges struct {
 	BlockedGroups []*Group `json:"blocked_groups,omitempty"`
 	// provides edit access to the risk to members of the group
 	Editors []*Group `json:"editors,omitempty"`
+	// ControlKind holds the value of the control_kind edge.
+	ControlKind *CustomTypeEnum `json:"control_kind,omitempty"`
 	// Standard holds the value of the standard edge.
 	Standard *Standard `json:"standard,omitempty"`
 	// Programs holds the value of the programs edge.
@@ -144,6 +155,8 @@ type ControlEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Scans holds the value of the scans edge.
 	Scans []*Scan `json:"scans,omitempty"`
+	// Findings holds the value of the findings edge.
+	Findings []*Finding `json:"findings,omitempty"`
 	// the implementation(s) of the control
 	ControlImplementations []*ControlImplementation `json:"control_implementations,omitempty"`
 	// Subcontrols holds the value of the subcontrols edge.
@@ -154,11 +167,13 @@ type ControlEdges struct {
 	MappedToControls []*MappedControl `json:"mapped_to_controls,omitempty"`
 	// MappedFromControls holds the value of the mapped_from_controls edge.
 	MappedFromControls []*MappedControl `json:"mapped_from_controls,omitempty"`
+	// ControlMappings holds the value of the control_mappings edge.
+	ControlMappings []*FindingControl `json:"control_mappings,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [24]bool
+	loadedTypes [27]bool
 	// totalCount holds the count of the edges above.
-	totalCount [22]map[string]int
+	totalCount [25]map[string]int
 
 	namedEvidence               map[string][]*Evidence
 	namedControlObjectives      map[string][]*ControlObjective
@@ -174,11 +189,13 @@ type ControlEdges struct {
 	namedPrograms               map[string][]*Program
 	namedAssets                 map[string][]*Asset
 	namedScans                  map[string][]*Scan
+	namedFindings               map[string][]*Finding
 	namedControlImplementations map[string][]*ControlImplementation
 	namedSubcontrols            map[string][]*Subcontrol
 	namedScheduledJobs          map[string][]*ScheduledJob
 	namedMappedToControls       map[string][]*MappedControl
 	namedMappedFromControls     map[string][]*MappedControl
+	namedControlMappings        map[string][]*FindingControl
 }
 
 // EvidenceOrErr returns the Evidence value or an error if the edge
@@ -324,12 +341,23 @@ func (e ControlEdges) EditorsOrErr() ([]*Group, error) {
 	return nil, &NotLoadedError{edge: "editors"}
 }
 
+// ControlKindOrErr returns the ControlKind value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ControlEdges) ControlKindOrErr() (*CustomTypeEnum, error) {
+	if e.ControlKind != nil {
+		return e.ControlKind, nil
+	} else if e.loadedTypes[15] {
+		return nil, &NotFoundError{label: customtypeenum.Label}
+	}
+	return nil, &NotLoadedError{edge: "control_kind"}
+}
+
 // StandardOrErr returns the Standard value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ControlEdges) StandardOrErr() (*Standard, error) {
 	if e.Standard != nil {
 		return e.Standard, nil
-	} else if e.loadedTypes[15] {
+	} else if e.loadedTypes[16] {
 		return nil, &NotFoundError{label: standard.Label}
 	}
 	return nil, &NotLoadedError{edge: "standard"}
@@ -338,7 +366,7 @@ func (e ControlEdges) StandardOrErr() (*Standard, error) {
 // ProgramsOrErr returns the Programs value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) ProgramsOrErr() ([]*Program, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[17] {
 		return e.Programs, nil
 	}
 	return nil, &NotLoadedError{edge: "programs"}
@@ -347,7 +375,7 @@ func (e ControlEdges) ProgramsOrErr() ([]*Program, error) {
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[18] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -356,16 +384,25 @@ func (e ControlEdges) AssetsOrErr() ([]*Asset, error) {
 // ScansOrErr returns the Scans value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) ScansOrErr() ([]*Scan, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[19] {
 		return e.Scans, nil
 	}
 	return nil, &NotLoadedError{edge: "scans"}
 }
 
+// FindingsOrErr returns the Findings value or an error if the edge
+// was not loaded in eager-loading.
+func (e ControlEdges) FindingsOrErr() ([]*Finding, error) {
+	if e.loadedTypes[20] {
+		return e.Findings, nil
+	}
+	return nil, &NotLoadedError{edge: "findings"}
+}
+
 // ControlImplementationsOrErr returns the ControlImplementations value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) ControlImplementationsOrErr() ([]*ControlImplementation, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[21] {
 		return e.ControlImplementations, nil
 	}
 	return nil, &NotLoadedError{edge: "control_implementations"}
@@ -374,7 +411,7 @@ func (e ControlEdges) ControlImplementationsOrErr() ([]*ControlImplementation, e
 // SubcontrolsOrErr returns the Subcontrols value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) SubcontrolsOrErr() ([]*Subcontrol, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[22] {
 		return e.Subcontrols, nil
 	}
 	return nil, &NotLoadedError{edge: "subcontrols"}
@@ -383,7 +420,7 @@ func (e ControlEdges) SubcontrolsOrErr() ([]*Subcontrol, error) {
 // ScheduledJobsOrErr returns the ScheduledJobs value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) ScheduledJobsOrErr() ([]*ScheduledJob, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[23] {
 		return e.ScheduledJobs, nil
 	}
 	return nil, &NotLoadedError{edge: "scheduled_jobs"}
@@ -392,7 +429,7 @@ func (e ControlEdges) ScheduledJobsOrErr() ([]*ScheduledJob, error) {
 // MappedToControlsOrErr returns the MappedToControls value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) MappedToControlsOrErr() ([]*MappedControl, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[24] {
 		return e.MappedToControls, nil
 	}
 	return nil, &NotLoadedError{edge: "mapped_to_controls"}
@@ -401,10 +438,19 @@ func (e ControlEdges) MappedToControlsOrErr() ([]*MappedControl, error) {
 // MappedFromControlsOrErr returns the MappedFromControls value or an error if the edge
 // was not loaded in eager-loading.
 func (e ControlEdges) MappedFromControlsOrErr() ([]*MappedControl, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[25] {
 		return e.MappedFromControls, nil
 	}
 	return nil, &NotLoadedError{edge: "mapped_from_controls"}
+}
+
+// ControlMappingsOrErr returns the ControlMappings value or an error if the edge
+// was not loaded in eager-loading.
+func (e ControlEdges) ControlMappingsOrErr() ([]*FindingControl, error) {
+	if e.loadedTypes[26] {
+		return e.ControlMappings, nil
+	}
+	return nil, &NotLoadedError{edge: "control_mappings"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -416,10 +462,18 @@ func (*Control) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case control.FieldSystemOwned:
 			values[i] = new(sql.NullBool)
-		case control.FieldID, control.FieldCreatedBy, control.FieldUpdatedBy, control.FieldDeletedBy, control.FieldDisplayID, control.FieldTitle, control.FieldDescription, control.FieldReferenceID, control.FieldAuditorReferenceID, control.FieldResponsiblePartyID, control.FieldStatus, control.FieldSource, control.FieldReferenceFramework, control.FieldReferenceFrameworkRevision, control.FieldControlType, control.FieldCategory, control.FieldCategoryID, control.FieldSubcategory, control.FieldControlOwnerID, control.FieldDelegateID, control.FieldOwnerID, control.FieldInternalNotes, control.FieldSystemInternalID, control.FieldRefCode, control.FieldStandardID:
+		case control.FieldID, control.FieldCreatedBy, control.FieldUpdatedBy, control.FieldDeletedBy, control.FieldDisplayID, control.FieldTitle, control.FieldDescription, control.FieldReferenceID, control.FieldAuditorReferenceID, control.FieldResponsiblePartyID, control.FieldStatus, control.FieldSource, control.FieldReferenceFramework, control.FieldReferenceFrameworkRevision, control.FieldControlType, control.FieldCategory, control.FieldCategoryID, control.FieldSubcategory, control.FieldControlOwnerID, control.FieldDelegateID, control.FieldOwnerID, control.FieldInternalNotes, control.FieldSystemInternalID, control.FieldControlKindName, control.FieldControlKindID, control.FieldRefCode, control.FieldStandardID:
 			values[i] = new(sql.NullString)
 		case control.FieldCreatedAt, control.FieldUpdatedAt, control.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
+		case control.ForeignKeys[0]: // custom_type_enum_controls
+			values[i] = new(sql.NullString)
+		case control.ForeignKeys[1]: // remediation_controls
+			values[i] = new(sql.NullString)
+		case control.ForeignKeys[2]: // review_controls
+			values[i] = new(sql.NullString)
+		case control.ForeignKeys[3]: // vulnerability_controls
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -674,6 +728,18 @@ func (_m *Control) assignValues(columns []string, values []any) error {
 				_m.SystemInternalID = new(string)
 				*_m.SystemInternalID = value.String
 			}
+		case control.FieldControlKindName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field control_kind_name", values[i])
+			} else if value.Valid {
+				_m.ControlKindName = value.String
+			}
+		case control.FieldControlKindID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field control_kind_id", values[i])
+			} else if value.Valid {
+				_m.ControlKindID = value.String
+			}
 		case control.FieldRefCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field ref_code", values[i])
@@ -685,6 +751,34 @@ func (_m *Control) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field standard_id", values[i])
 			} else if value.Valid {
 				_m.StandardID = value.String
+			}
+		case control.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field custom_type_enum_controls", values[i])
+			} else if value.Valid {
+				_m.custom_type_enum_controls = new(string)
+				*_m.custom_type_enum_controls = value.String
+			}
+		case control.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field remediation_controls", values[i])
+			} else if value.Valid {
+				_m.remediation_controls = new(string)
+				*_m.remediation_controls = value.String
+			}
+		case control.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field review_controls", values[i])
+			} else if value.Valid {
+				_m.review_controls = new(string)
+				*_m.review_controls = value.String
+			}
+		case control.ForeignKeys[3]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field vulnerability_controls", values[i])
+			} else if value.Valid {
+				_m.vulnerability_controls = new(string)
+				*_m.vulnerability_controls = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -774,6 +868,11 @@ func (_m *Control) QueryEditors() *GroupQuery {
 	return NewControlClient(_m.config).QueryEditors(_m)
 }
 
+// QueryControlKind queries the "control_kind" edge of the Control entity.
+func (_m *Control) QueryControlKind() *CustomTypeEnumQuery {
+	return NewControlClient(_m.config).QueryControlKind(_m)
+}
+
 // QueryStandard queries the "standard" edge of the Control entity.
 func (_m *Control) QueryStandard() *StandardQuery {
 	return NewControlClient(_m.config).QueryStandard(_m)
@@ -792,6 +891,11 @@ func (_m *Control) QueryAssets() *AssetQuery {
 // QueryScans queries the "scans" edge of the Control entity.
 func (_m *Control) QueryScans() *ScanQuery {
 	return NewControlClient(_m.config).QueryScans(_m)
+}
+
+// QueryFindings queries the "findings" edge of the Control entity.
+func (_m *Control) QueryFindings() *FindingQuery {
+	return NewControlClient(_m.config).QueryFindings(_m)
 }
 
 // QueryControlImplementations queries the "control_implementations" edge of the Control entity.
@@ -817,6 +921,11 @@ func (_m *Control) QueryMappedToControls() *MappedControlQuery {
 // QueryMappedFromControls queries the "mapped_from_controls" edge of the Control entity.
 func (_m *Control) QueryMappedFromControls() *MappedControlQuery {
 	return NewControlClient(_m.config).QueryMappedFromControls(_m)
+}
+
+// QueryControlMappings queries the "control_mappings" edge of the Control entity.
+func (_m *Control) QueryControlMappings() *FindingControlQuery {
+	return NewControlClient(_m.config).QueryControlMappings(_m)
 }
 
 // Update returns a builder for updating this Control.
@@ -956,6 +1065,12 @@ func (_m *Control) String() string {
 		builder.WriteString("system_internal_id=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("control_kind_name=")
+	builder.WriteString(_m.ControlKindName)
+	builder.WriteString(", ")
+	builder.WriteString("control_kind_id=")
+	builder.WriteString(_m.ControlKindID)
 	builder.WriteString(", ")
 	builder.WriteString("ref_code=")
 	builder.WriteString(_m.RefCode)
@@ -1302,6 +1417,30 @@ func (_m *Control) appendNamedScans(name string, edges ...*Scan) {
 	}
 }
 
+// NamedFindings returns the Findings named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *Control) NamedFindings(name string) ([]*Finding, error) {
+	if _m.Edges.namedFindings == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedFindings[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *Control) appendNamedFindings(name string, edges ...*Finding) {
+	if _m.Edges.namedFindings == nil {
+		_m.Edges.namedFindings = make(map[string][]*Finding)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedFindings[name] = []*Finding{}
+	} else {
+		_m.Edges.namedFindings[name] = append(_m.Edges.namedFindings[name], edges...)
+	}
+}
+
 // NamedControlImplementations returns the ControlImplementations named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (_m *Control) NamedControlImplementations(name string) ([]*ControlImplementation, error) {
@@ -1419,6 +1558,30 @@ func (_m *Control) appendNamedMappedFromControls(name string, edges ...*MappedCo
 		_m.Edges.namedMappedFromControls[name] = []*MappedControl{}
 	} else {
 		_m.Edges.namedMappedFromControls[name] = append(_m.Edges.namedMappedFromControls[name], edges...)
+	}
+}
+
+// NamedControlMappings returns the ControlMappings named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *Control) NamedControlMappings(name string) ([]*FindingControl, error) {
+	if _m.Edges.namedControlMappings == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedControlMappings[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *Control) appendNamedControlMappings(name string, edges ...*FindingControl) {
+	if _m.Edges.namedControlMappings == nil {
+		_m.Edges.namedControlMappings = make(map[string][]*FindingControl)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedControlMappings[name] = []*FindingControl{}
+	} else {
+		_m.Edges.namedControlMappings[name] = append(_m.Edges.namedControlMappings[name], edges...)
 	}
 }
 

@@ -11,7 +11,9 @@
 </div>
 
 This repository houses the core server and orchestration elements which are at
-the heart of the [Openlane](https://www.theopenlane.io) cloud service, which is targeted for public release towards mid-2025 - sign up for our [waitlist](https://console.theopenlane.io/waitlist) to get access! Our initial featureset includes:
+the heart of the [Openlane](https://www.theopenlane.io) cloud service. [Sign up for an account today](https://console.theopenlane.io/signup) (no credit card required) and try it out!
+
+## Feature Overview
 
 - Creation of new programs that include pre-built templates, controls, risks, etc., for standards like SOC2, ISO27001, NIST800-53, and more
 - Automated Task assignments and configurable workflows with task reminders and escalation
@@ -24,7 +26,7 @@ the heart of the [Openlane](https://www.theopenlane.io) cloud service, which is 
 - Easy to use documentation editors and storage for Policies and Procedures, or whatever documentation is needed
   .... and more!
 
-We have our sights set on additional features such as:
+### High-level Roadmap
 
 - Trust Center and vanity domains
 - Automated Evidence collection
@@ -56,7 +58,7 @@ included. Please see the associated documentation.
 
 ### Installing the CLI
 
-You can install the Openlane CLI by running `brew install theopenlane/tap/openlane`
+You can install the Openlane CLI by running `brew install --cask theopenlane/tap/openlane`
 
 ### Updating Configuration Settings
 
@@ -65,7 +67,8 @@ See the [README](/config/README.md) in the `config` directory.
 ### Starting the Server
 
 1. Copy the config, this is in .gitignore so you do not have to worry about
-   accidentally committing secrets
+   accidentally committing secrets. This will be done automatically if it doesn't
+   already exist when starting the api server locally with the Taskfile.
 
    ```bash
    cp ./config/config-dev.example.yaml ./config/.config.yaml
@@ -184,7 +187,7 @@ You can load up a local openFGA environment with the compose setup in this
 repository; `task fga:up` - this will launch an interactive playground where you
 can model permissions model(s) or changes to the models
 
-### Windill
+### Windmill
 
 We use Windmill to run automated scripts periodically amongst others. You can
 load up a local instance by running `task docker:windmill:up`. This will
@@ -230,9 +233,9 @@ See the [contributing](.github/CONTRIBUTING.md) guide for more information.
 
 We have additionally open-sourced the [Openlane UI](https://github.com/theopenlane/openlane-ui) and you can run / use this technology locally (or host it on your own servers) but we have not undergone efforts to ensure things such as links to our Terms of Service or Privacy policy, or other proprietary branding or assets owned by theopenlane, Inc., are fully configurable or removable.
 
-## Features
+## Technology
 
-At it's core, this repo is a collection of services built on top of an entity
+At its core, this repo is a collection of services built on top of an entity
 framework which allows us to:
 
 - Model database schemas as graph structures

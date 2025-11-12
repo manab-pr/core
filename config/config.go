@@ -2,6 +2,8 @@ package config
 
 import (
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"os"
 	"reflect"
 
@@ -38,6 +40,8 @@ import (
 	"github.com/theopenlane/core/pkg/middleware/secure"
 	"github.com/theopenlane/core/pkg/objects/storage"
 )
+
+const stripeWebhookSecretSegmentLimit = 3
 
 // Config contains the configuration for the core server
 type Config struct {
@@ -119,6 +123,8 @@ type Server struct {
 	GraphPool PondPool `json:"graphPool" koanf:"graphPool"`
 	// EnableGraphExtensions enables the graph extensions for the graph resolvers
 	EnableGraphExtensions bool `json:"enableGraphExtensions" koanf:"enableGraphExtensions" default:"true"`
+	// EnableGraphSubscriptions enables graphql subscriptions to the server using websockets or sse
+	EnableGraphSubscriptions bool `json:"enableGraphSubscriptions" koanf:"enableGraphSubscriptions" default:"false"`
 	// ComplexityLimit sets the maximum complexity allowed for a query
 	ComplexityLimit int `json:"complexityLimit" koanf:"complexityLimit" default:"100"`
 	// MaxResultLimit sets the maximum number of results allowed for a query
@@ -163,7 +169,7 @@ type Auth struct {
 // TLS settings for the server for secure connections
 type TLS struct {
 	// Config contains the tls.Config settings
-	Config *tls.Config `json:"config" koanf:"config" jsonschema:"-"`
+	Config *tls.Config `json:"-" koanf:"-" jsonschema:"-"`
 	// Enabled turns on TLS settings for the server
 	Enabled bool `json:"enabled" koanf:"enabled" default:"false"`
 	// CertFile location for the TLS server
@@ -191,7 +197,8 @@ type Slack struct {
 }
 
 var (
-	defaultConfigFilePath = "./config/.config.yaml"
+	defaultConfigFilePath         = "./config/.config.yaml"
+	ErrStripeWebhookVersionsMatch = errors.New("subscription.stripeWebhookAPIVersion must differ from subscription.stripeWebhookDiscardAPIVersion")
 )
 
 // Option configures the Config
@@ -331,7 +338,16 @@ func Load(cfgFile *string) (*Config, error) {
 	if err := k.Load(env.Provider(".", env.Opt{
 		Prefix: "CORE_",
 		TransformFunc: func(key, v string) (string, any) {
-			key = strings.ReplaceAll(strings.ToLower(strings.TrimPrefix(key, "CORE_")), "_", ".")
+			key = strings.ToLower(strings.TrimPrefix(key, "CORE_"))
+			key = strings.ReplaceAll(key, "_", ".")
+
+			if strings.HasPrefix(key, "subscription.stripewebhooksecrets.") {
+				segments := strings.Split(key, ".")
+				if len(segments) > stripeWebhookSecretSegmentLimit {
+					version := strings.Join(segments[2:], "-")
+					key = strings.Join([]string{segments[0], segments[1], version}, ".")
+				}
+			}
 
 			if strings.Contains(v, ",") {
 				return key, strings.Split(v, ",")
@@ -350,5 +366,22 @@ func Load(cfgFile *string) (*Config, error) {
 
 	conf.applyDomainOverrides()
 
+	if err := conf.validate(); err != nil {
+		return nil, err
+	}
+
 	return conf, nil
+}
+
+// validate performs cross-field validation on the loaded configuration
+func (c *Config) validate() error {
+	ent := c.Entitlements
+
+	if ent.StripeWebhookAPIVersion != "" &&
+		ent.StripeWebhookDiscardAPIVersion != "" &&
+		ent.StripeWebhookAPIVersion == ent.StripeWebhookDiscardAPIVersion {
+		return fmt.Errorf("subscription.stripeWebhookAPIVersion (%s) must differ from subscription.stripeWebhookDiscardAPIVersion: %w", ent.StripeWebhookAPIVersion, ErrStripeWebhookVersionsMatch)
+	}
+
+	return nil
 }

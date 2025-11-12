@@ -302,6 +302,76 @@ func (_c *UserCreate) SetNillableRole(v *enums.Role) *UserCreate {
 	return _c
 }
 
+// SetScimExternalID sets the "scim_external_id" field.
+func (_c *UserCreate) SetScimExternalID(v string) *UserCreate {
+	_c.mutation.SetScimExternalID(v)
+	return _c
+}
+
+// SetNillableScimExternalID sets the "scim_external_id" field if the given value is not nil.
+func (_c *UserCreate) SetNillableScimExternalID(v *string) *UserCreate {
+	if v != nil {
+		_c.SetScimExternalID(*v)
+	}
+	return _c
+}
+
+// SetScimUsername sets the "scim_username" field.
+func (_c *UserCreate) SetScimUsername(v string) *UserCreate {
+	_c.mutation.SetScimUsername(v)
+	return _c
+}
+
+// SetNillableScimUsername sets the "scim_username" field if the given value is not nil.
+func (_c *UserCreate) SetNillableScimUsername(v *string) *UserCreate {
+	if v != nil {
+		_c.SetScimUsername(*v)
+	}
+	return _c
+}
+
+// SetScimActive sets the "scim_active" field.
+func (_c *UserCreate) SetScimActive(v bool) *UserCreate {
+	_c.mutation.SetScimActive(v)
+	return _c
+}
+
+// SetNillableScimActive sets the "scim_active" field if the given value is not nil.
+func (_c *UserCreate) SetNillableScimActive(v *bool) *UserCreate {
+	if v != nil {
+		_c.SetScimActive(*v)
+	}
+	return _c
+}
+
+// SetScimPreferredLanguage sets the "scim_preferred_language" field.
+func (_c *UserCreate) SetScimPreferredLanguage(v string) *UserCreate {
+	_c.mutation.SetScimPreferredLanguage(v)
+	return _c
+}
+
+// SetNillableScimPreferredLanguage sets the "scim_preferred_language" field if the given value is not nil.
+func (_c *UserCreate) SetNillableScimPreferredLanguage(v *string) *UserCreate {
+	if v != nil {
+		_c.SetScimPreferredLanguage(*v)
+	}
+	return _c
+}
+
+// SetScimLocale sets the "scim_locale" field.
+func (_c *UserCreate) SetScimLocale(v string) *UserCreate {
+	_c.mutation.SetScimLocale(v)
+	return _c
+}
+
+// SetNillableScimLocale sets the "scim_locale" field if the given value is not nil.
+func (_c *UserCreate) SetNillableScimLocale(v *string) *UserCreate {
+	if v != nil {
+		_c.SetScimLocale(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *UserCreate) SetID(v string) *UserCreate {
 	_c.mutation.SetID(v)
@@ -571,23 +641,19 @@ func (_c *UserCreate) AddPrograms(v ...*Program) *UserCreate {
 	return _c.AddProgramIDs(ids...)
 }
 
-// SetProgramOwnerID sets the "program_owner" edge to the Program entity by ID.
-func (_c *UserCreate) SetProgramOwnerID(id string) *UserCreate {
-	_c.mutation.SetProgramOwnerID(id)
+// AddProgramsOwnedIDs adds the "programs_owned" edge to the Program entity by IDs.
+func (_c *UserCreate) AddProgramsOwnedIDs(ids ...string) *UserCreate {
+	_c.mutation.AddProgramsOwnedIDs(ids...)
 	return _c
 }
 
-// SetNillableProgramOwnerID sets the "program_owner" edge to the Program entity by ID if the given value is not nil.
-func (_c *UserCreate) SetNillableProgramOwnerID(id *string) *UserCreate {
-	if id != nil {
-		_c = _c.SetProgramOwnerID(*id)
+// AddProgramsOwned adds the "programs_owned" edges to the Program entity.
+func (_c *UserCreate) AddProgramsOwned(v ...*Program) *UserCreate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return _c
-}
-
-// SetProgramOwner sets the "program_owner" edge to the Program entity.
-func (_c *UserCreate) SetProgramOwner(v *Program) *UserCreate {
-	return _c.SetProgramOwnerID(v.ID)
+	return _c.AddProgramsOwnedIDs(ids...)
 }
 
 // AddImpersonationEventIDs adds the "impersonation_events" edge to the ImpersonationEvent entity by IDs.
@@ -734,6 +800,10 @@ func (_c *UserCreate) defaults() error {
 	if _, ok := _c.mutation.Role(); !ok {
 		v := user.DefaultRole
 		_c.mutation.SetRole(v)
+	}
+	if _, ok := _c.mutation.ScimActive(); !ok {
+		v := user.DefaultScimActive
+		_c.mutation.SetScimActive(v)
 	}
 	if _, ok := _c.mutation.ID(); !ok {
 		if user.DefaultID == nil {
@@ -922,6 +992,26 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = value
+	}
+	if value, ok := _c.mutation.ScimExternalID(); ok {
+		_spec.SetField(user.FieldScimExternalID, field.TypeString, value)
+		_node.ScimExternalID = &value
+	}
+	if value, ok := _c.mutation.ScimUsername(); ok {
+		_spec.SetField(user.FieldScimUsername, field.TypeString, value)
+		_node.ScimUsername = &value
+	}
+	if value, ok := _c.mutation.ScimActive(); ok {
+		_spec.SetField(user.FieldScimActive, field.TypeBool, value)
+		_node.ScimActive = value
+	}
+	if value, ok := _c.mutation.ScimPreferredLanguage(); ok {
+		_spec.SetField(user.FieldScimPreferredLanguage, field.TypeString, value)
+		_node.ScimPreferredLanguage = &value
+	}
+	if value, ok := _c.mutation.ScimLocale(); ok {
+		_spec.SetField(user.FieldScimLocale, field.TypeString, value)
+		_node.ScimLocale = &value
 	}
 	if nodes := _c.mutation.PersonalAccessTokensIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -1234,12 +1324,12 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.ProgramOwnerIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ProgramsOwnedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ProgramOwnerTable,
-			Columns: []string{user.ProgramOwnerColumn},
+			Table:   user.ProgramsOwnedTable,
+			Columns: []string{user.ProgramsOwnedColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeString),

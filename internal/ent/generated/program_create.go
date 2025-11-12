@@ -13,6 +13,7 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/actionplan"
 	"github.com/theopenlane/core/internal/ent/generated/control"
 	"github.com/theopenlane/core/internal/ent/generated/controlobjective"
+	"github.com/theopenlane/core/internal/ent/generated/customtypeenum"
 	"github.com/theopenlane/core/internal/ent/generated/evidence"
 	"github.com/theopenlane/core/internal/ent/generated/file"
 	"github.com/theopenlane/core/internal/ent/generated/group"
@@ -143,6 +144,34 @@ func (_c *ProgramCreate) SetOwnerID(v string) *ProgramCreate {
 func (_c *ProgramCreate) SetNillableOwnerID(v *string) *ProgramCreate {
 	if v != nil {
 		_c.SetOwnerID(*v)
+	}
+	return _c
+}
+
+// SetProgramKindName sets the "program_kind_name" field.
+func (_c *ProgramCreate) SetProgramKindName(v string) *ProgramCreate {
+	_c.mutation.SetProgramKindName(v)
+	return _c
+}
+
+// SetNillableProgramKindName sets the "program_kind_name" field if the given value is not nil.
+func (_c *ProgramCreate) SetNillableProgramKindName(v *string) *ProgramCreate {
+	if v != nil {
+		_c.SetProgramKindName(*v)
+	}
+	return _c
+}
+
+// SetProgramKindID sets the "program_kind_id" field.
+func (_c *ProgramCreate) SetProgramKindID(v string) *ProgramCreate {
+	_c.mutation.SetProgramKindID(v)
+	return _c
+}
+
+// SetNillableProgramKindID sets the "program_kind_id" field if the given value is not nil.
+func (_c *ProgramCreate) SetNillableProgramKindID(v *string) *ProgramCreate {
+	if v != nil {
+		_c.SetProgramKindID(*v)
 	}
 	return _c
 }
@@ -399,6 +428,11 @@ func (_c *ProgramCreate) AddViewers(v ...*Group) *ProgramCreate {
 	return _c.AddViewerIDs(ids...)
 }
 
+// SetProgramKind sets the "program_kind" edge to the CustomTypeEnum entity.
+func (_c *ProgramCreate) SetProgramKind(v *CustomTypeEnum) *ProgramCreate {
+	return _c.SetProgramKindID(v.ID)
+}
+
 // AddControlIDs adds the "controls" edge to the Control entity by IDs.
 func (_c *ProgramCreate) AddControlIDs(ids ...string) *ProgramCreate {
 	_c.mutation.AddControlIDs(ids...)
@@ -594,23 +628,9 @@ func (_c *ProgramCreate) AddUsers(v ...*User) *ProgramCreate {
 	return _c.AddUserIDs(ids...)
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_c *ProgramCreate) SetUserID(id string) *ProgramCreate {
-	_c.mutation.SetUserID(id)
-	return _c
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_c *ProgramCreate) SetNillableUserID(id *string) *ProgramCreate {
-	if id != nil {
-		_c = _c.SetUserID(*id)
-	}
-	return _c
-}
-
-// SetUser sets the "user" edge to the User entity.
-func (_c *ProgramCreate) SetUser(v *User) *ProgramCreate {
-	return _c.SetUserID(v.ID)
+// SetProgramOwner sets the "program_owner" edge to the User entity.
+func (_c *ProgramCreate) SetProgramOwner(v *User) *ProgramCreate {
+	return _c.SetProgramOwnerID(v.ID)
 }
 
 // AddMemberIDs adds the "members" edge to the ProgramMembership entity by IDs.
@@ -834,6 +854,10 @@ func (_c *ProgramCreate) createSpec() (*Program, *sqlgraph.CreateSpec) {
 		_spec.SetField(program.FieldTags, field.TypeJSON, value)
 		_node.Tags = value
 	}
+	if value, ok := _c.mutation.ProgramKindName(); ok {
+		_spec.SetField(program.FieldProgramKindName, field.TypeString, value)
+		_node.ProgramKindName = value
+	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(program.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -953,6 +977,24 @@ func (_c *ProgramCreate) createSpec() (*Program, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ProgramKindIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   program.ProgramKindTable,
+			Columns: []string{program.ProgramKindColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customtypeenum.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _c.schemaConfig.Program
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ProgramKindID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.ControlsIDs(); len(nodes) > 0 {
@@ -1183,12 +1225,12 @@ func (_c *ProgramCreate) createSpec() (*Program, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ProgramOwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   program.UserTable,
-			Columns: []string{program.UserColumn},
+			Table:   program.ProgramOwnerTable,
+			Columns: []string{program.ProgramOwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeString),

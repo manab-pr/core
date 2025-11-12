@@ -78,6 +78,10 @@ extend type Mutation{
         New values for the internalPolicy
         """
         input: UpdateInternalPolicyInput!
+        """
+		file containing values of the internalPolicy
+		"""
+		internalPolicyFile: Upload
     ): InternalPolicyUpdatePayload!
     """
     Delete an existing internalPolicy
@@ -88,6 +92,15 @@ extend type Mutation{
         """
         id: ID!
     ): InternalPolicyDeletePayload!
+    """
+    Delete multiple internalPolicys
+    """
+    deleteBulkInternalPolicy(
+        """
+        IDs of the internalPolicys to delete
+        """
+        ids: [ID!]!
+    ): InternalPolicyBulkDeletePayload!
 }
 
 """
@@ -142,4 +155,14 @@ type InternalPolicyBulkUpdatePayload {
     IDs of the updated internalPolicys
     """
     updatedIDs: [ID!]
+}
+
+"""
+Return response for deleteBulkInternalPolicy mutation
+"""
+type InternalPolicyBulkDeletePayload {
+    """
+    Deleted internalPolicy IDs
+    """
+    deletedIDs: [ID!]!
 }

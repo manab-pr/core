@@ -35,6 +35,10 @@ const (
 	FieldSlug = "slug"
 	// FieldCustomDomainID holds the string denoting the custom_domain_id field in the database.
 	FieldCustomDomainID = "custom_domain_id"
+	// FieldPirschDomainID holds the string denoting the pirsch_domain_id field in the database.
+	FieldPirschDomainID = "pirsch_domain_id"
+	// FieldPirschIdentificationCode holds the string denoting the pirsch_identification_code field in the database.
+	FieldPirschIdentificationCode = "pirsch_identification_code"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// EdgeCustomDomain holds the string denoting the custom_domain edge name in mutations.
@@ -51,6 +55,8 @@ const (
 	EdgeTrustCenterCompliances = "trust_center_compliances"
 	// EdgeTemplates holds the string denoting the templates edge name in mutations.
 	EdgeTemplates = "templates"
+	// EdgePosts holds the string denoting the posts edge name in mutations.
+	EdgePosts = "posts"
 	// Table holds the table name of the trustcenter in the database.
 	Table = "trust_centers"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -109,6 +115,13 @@ const (
 	TemplatesInverseTable = "templates"
 	// TemplatesColumn is the table column denoting the templates relation/edge.
 	TemplatesColumn = "trust_center_id"
+	// PostsTable is the table that holds the posts relation/edge.
+	PostsTable = "notes"
+	// PostsInverseTable is the table name for the Note entity.
+	// It exists in this package in order to avoid circular dependency with the "note" package.
+	PostsInverseTable = "notes"
+	// PostsColumn is the table column denoting the posts relation/edge.
+	PostsColumn = "trust_center_posts"
 )
 
 // Columns holds all SQL columns for trustcenter fields.
@@ -124,6 +137,8 @@ var Columns = []string{
 	FieldOwnerID,
 	FieldSlug,
 	FieldCustomDomainID,
+	FieldPirschDomainID,
+	FieldPirschIdentificationCode,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "trust_centers"
@@ -153,7 +168,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [7]ent.Hook
+	Hooks        [8]ent.Hook
 	Interceptors [4]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -221,6 +236,16 @@ func BySlug(opts ...sql.OrderTermOption) OrderOption {
 // ByCustomDomainID orders the results by the custom_domain_id field.
 func ByCustomDomainID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCustomDomainID, opts...).ToFunc()
+}
+
+// ByPirschDomainID orders the results by the pirsch_domain_id field.
+func ByPirschDomainID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPirschDomainID, opts...).ToFunc()
+}
+
+// ByPirschIdentificationCode orders the results by the pirsch_identification_code field.
+func ByPirschIdentificationCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPirschIdentificationCode, opts...).ToFunc()
 }
 
 // ByOwnerField orders the results by owner field.
@@ -306,6 +331,20 @@ func ByTemplates(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTemplatesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPostsCount orders the results by posts count.
+func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostsStep(), opts...)
+	}
+}
+
+// ByPosts orders the results by posts terms.
+func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -360,5 +399,12 @@ func newTemplatesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TemplatesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, TemplatesTable, TemplatesColumn),
+	)
+}
+func newPostsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
 	)
 }

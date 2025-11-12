@@ -109,7 +109,7 @@ func (r *mutationResolver) UpdateBulkInternalPolicy(ctx context.Context, ids []s
 }
 
 // UpdateInternalPolicy is the resolver for the updateInternalPolicy field.
-func (r *mutationResolver) UpdateInternalPolicy(ctx context.Context, id string, input generated.UpdateInternalPolicyInput) (*model.InternalPolicyUpdatePayload, error) {
+func (r *mutationResolver) UpdateInternalPolicy(ctx context.Context, id string, input generated.UpdateInternalPolicyInput, internalPolicyFile *graphql.Upload) (*model.InternalPolicyUpdatePayload, error) {
 	res, err := withTransactionalMutation(ctx).InternalPolicy.Get(ctx, id)
 	if err != nil {
 		return nil, parseRequestError(err, action{action: ActionUpdate, object: "internalpolicy"})
@@ -148,6 +148,15 @@ func (r *mutationResolver) DeleteInternalPolicy(ctx context.Context, id string) 
 	return &model.InternalPolicyDeletePayload{
 		DeletedID: id,
 	}, nil
+}
+
+// DeleteBulkInternalPolicy is the resolver for the deleteBulkInternalPolicy field.
+func (r *mutationResolver) DeleteBulkInternalPolicy(ctx context.Context, ids []string) (*model.InternalPolicyBulkDeletePayload, error) {
+	if len(ids) == 0 {
+		return nil, rout.NewMissingRequiredFieldError("ids")
+	}
+
+	return r.bulkDeleteInternalPolicy(ctx, ids)
 }
 
 // InternalPolicy is the resolver for the internalPolicy field.

@@ -109,7 +109,7 @@ func (r *mutationResolver) UpdateBulkProcedure(ctx context.Context, ids []string
 }
 
 // UpdateProcedure is the resolver for the updateProcedure field.
-func (r *mutationResolver) UpdateProcedure(ctx context.Context, id string, input generated.UpdateProcedureInput) (*model.ProcedureUpdatePayload, error) {
+func (r *mutationResolver) UpdateProcedure(ctx context.Context, id string, input generated.UpdateProcedureInput, procedureFile *graphql.Upload) (*model.ProcedureUpdatePayload, error) {
 	res, err := withTransactionalMutation(ctx).Procedure.Get(ctx, id)
 	if err != nil {
 		return nil, parseRequestError(err, action{action: ActionUpdate, object: "procedure"})
@@ -148,6 +148,15 @@ func (r *mutationResolver) DeleteProcedure(ctx context.Context, id string) (*mod
 	return &model.ProcedureDeletePayload{
 		DeletedID: id,
 	}, nil
+}
+
+// DeleteBulkProcedure is the resolver for the deleteBulkProcedure field.
+func (r *mutationResolver) DeleteBulkProcedure(ctx context.Context, ids []string) (*model.ProcedureBulkDeletePayload, error) {
+	if len(ids) == 0 {
+		return nil, rout.NewMissingRequiredFieldError("ids")
+	}
+
+	return r.bulkDeleteProcedure(ctx, ids)
 }
 
 // Procedure is the resolver for the procedure field.

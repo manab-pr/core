@@ -60,6 +60,16 @@ const (
 	FieldAuthProvider = "auth_provider"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// FieldScimExternalID holds the string denoting the scim_external_id field in the database.
+	FieldScimExternalID = "scim_external_id"
+	// FieldScimUsername holds the string denoting the scim_username field in the database.
+	FieldScimUsername = "scim_username"
+	// FieldScimActive holds the string denoting the scim_active field in the database.
+	FieldScimActive = "scim_active"
+	// FieldScimPreferredLanguage holds the string denoting the scim_preferred_language field in the database.
+	FieldScimPreferredLanguage = "scim_preferred_language"
+	// FieldScimLocale holds the string denoting the scim_locale field in the database.
+	FieldScimLocale = "scim_locale"
 	// EdgePersonalAccessTokens holds the string denoting the personal_access_tokens edge name in mutations.
 	EdgePersonalAccessTokens = "personal_access_tokens"
 	// EdgeTfaSettings holds the string denoting the tfa_settings edge name in mutations.
@@ -94,8 +104,8 @@ const (
 	EdgeAssigneeTasks = "assignee_tasks"
 	// EdgePrograms holds the string denoting the programs edge name in mutations.
 	EdgePrograms = "programs"
-	// EdgeProgramOwner holds the string denoting the program_owner edge name in mutations.
-	EdgeProgramOwner = "program_owner"
+	// EdgeProgramsOwned holds the string denoting the programs_owned edge name in mutations.
+	EdgeProgramsOwned = "programs_owned"
 	// EdgeImpersonationEvents holds the string denoting the impersonation_events edge name in mutations.
 	EdgeImpersonationEvents = "impersonation_events"
 	// EdgeTargetedImpersonations holds the string denoting the targeted_impersonations edge name in mutations.
@@ -217,13 +227,13 @@ const (
 	// ProgramsInverseTable is the table name for the Program entity.
 	// It exists in this package in order to avoid circular dependency with the "program" package.
 	ProgramsInverseTable = "programs"
-	// ProgramOwnerTable is the table that holds the program_owner relation/edge.
-	ProgramOwnerTable = "programs"
-	// ProgramOwnerInverseTable is the table name for the Program entity.
+	// ProgramsOwnedTable is the table that holds the programs_owned relation/edge.
+	ProgramsOwnedTable = "programs"
+	// ProgramsOwnedInverseTable is the table name for the Program entity.
 	// It exists in this package in order to avoid circular dependency with the "program" package.
-	ProgramOwnerInverseTable = "programs"
-	// ProgramOwnerColumn is the table column denoting the program_owner relation/edge.
-	ProgramOwnerColumn = "program_owner_id"
+	ProgramsOwnedInverseTable = "programs"
+	// ProgramsOwnedColumn is the table column denoting the programs_owned relation/edge.
+	ProgramsOwnedColumn = "program_owner_id"
 	// ImpersonationEventsTable is the table that holds the impersonation_events relation/edge.
 	ImpersonationEventsTable = "impersonation_events"
 	// ImpersonationEventsInverseTable is the table name for the ImpersonationEvent entity.
@@ -285,6 +295,11 @@ var Columns = []string{
 	FieldSub,
 	FieldAuthProvider,
 	FieldRole,
+	FieldScimExternalID,
+	FieldScimUsername,
+	FieldScimActive,
+	FieldScimPreferredLanguage,
+	FieldScimLocale,
 }
 
 var (
@@ -321,7 +336,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [8]ent.Hook
+	Hooks        [9]ent.Hook
 	Interceptors [2]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -350,6 +365,8 @@ var (
 	UpdateDefaultAvatarUpdatedAt func() time.Time
 	// UpdateDefaultLastSeen holds the default value on update for the "last_seen" field.
 	UpdateDefaultLastSeen func() time.Time
+	// DefaultScimActive holds the default value on creation for the "scim_active" field.
+	DefaultScimActive bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
@@ -494,6 +511,31 @@ func ByAuthProvider(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
+// ByScimExternalID orders the results by the scim_external_id field.
+func ByScimExternalID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScimExternalID, opts...).ToFunc()
+}
+
+// ByScimUsername orders the results by the scim_username field.
+func ByScimUsername(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScimUsername, opts...).ToFunc()
+}
+
+// ByScimActive orders the results by the scim_active field.
+func ByScimActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScimActive, opts...).ToFunc()
+}
+
+// ByScimPreferredLanguage orders the results by the scim_preferred_language field.
+func ByScimPreferredLanguage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScimPreferredLanguage, opts...).ToFunc()
+}
+
+// ByScimLocale orders the results by the scim_locale field.
+func ByScimLocale(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScimLocale, opts...).ToFunc()
 }
 
 // ByPersonalAccessTokensCount orders the results by personal_access_tokens count.
@@ -720,10 +762,17 @@ func ByPrograms(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByProgramOwnerField orders the results by program_owner field.
-func ByProgramOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByProgramsOwnedCount orders the results by programs_owned count.
+func ByProgramsOwnedCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProgramOwnerStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newProgramsOwnedStep(), opts...)
+	}
+}
+
+// ByProgramsOwned orders the results by programs_owned terms.
+func ByProgramsOwned(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProgramsOwnedStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -915,11 +964,11 @@ func newProgramsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, ProgramsTable, ProgramsPrimaryKey...),
 	)
 }
-func newProgramOwnerStep() *sqlgraph.Step {
+func newProgramsOwnedStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProgramOwnerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, ProgramOwnerTable, ProgramOwnerColumn),
+		sqlgraph.To(ProgramsOwnedInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ProgramsOwnedTable, ProgramsOwnedColumn),
 	)
 }
 func newImpersonationEventsStep() *sqlgraph.Step {

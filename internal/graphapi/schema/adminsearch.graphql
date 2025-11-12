@@ -50,6 +50,56 @@ extend type Query{
         last: Int
     ): ActionPlanConnection
     """
+    Search across Assessment objects
+    """
+    adminAssessmentSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): AssessmentConnection
+    """
+    Search across AssessmentResponse objects
+    """
+    adminAssessmentResponseSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): AssessmentResponseConnection
+    """
     Search across Asset objects
     """
     adminAssetSearch(
@@ -199,6 +249,31 @@ extend type Query{
         """
         last: Int
     ): CustomDomainConnection
+    """
+    Search across CustomTypeEnum objects
+    """
+    adminCustomTypeEnumSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): CustomTypeEnumConnection
     """
     Search across DNSVerification objects
     """
@@ -374,6 +449,31 @@ extend type Query{
         """
         last: Int
     ): FileConnection
+    """
+    Search across Finding objects
+    """
+    adminFindingSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): FindingConnection
     """
     Search across Group objects
     """
@@ -800,6 +900,56 @@ extend type Query{
         last: Int
     ): ProgramConnection
     """
+    Search across Remediation objects
+    """
+    adminRemediationSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): RemediationConnection
+    """
+    Search across Review objects
+    """
+    adminReviewSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): ReviewConnection
+    """
     Search across Risk objects
     """
     adminRiskSearch(
@@ -949,6 +1099,31 @@ extend type Query{
         """
         last: Int
     ): SubscriberConnection
+    """
+    Search across TagDefinition objects
+    """
+    adminTagDefinitionSearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): TagDefinitionConnection
     """
     Search across Task objects
     """
@@ -1124,6 +1299,31 @@ extend type Query{
         """
         last: Int
     ): UserSettingConnection
+    """
+    Search across Vulnerability objects
+    """
+    adminVulnerabilitySearch(
+        """
+        Query string to search across objects
+        """
+        query: String!
+        """
+        Returns the elements in the list that come after the specified cursor.
+        """
+        after: Cursor
+        """
+        Returns the first _n_ elements from the list.
+        """
+        first: Int
+        """
+        Returns the elements in the list that come before the specified cursor.
+        """
+        before: Cursor
+        """
+        Returns the last _n_ elements from the list.
+        """
+        last: Int
+    ): VulnerabilityConnection
     """
     Search across Webauthn objects
     """

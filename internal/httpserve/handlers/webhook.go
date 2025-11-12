@@ -3,15 +3,17 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog/log"
-	"github.com/stripe/stripe-go/v82"
-	"github.com/stripe/stripe-go/v82/webhook"
+	"github.com/stripe/stripe-go/v83"
+	"github.com/stripe/stripe-go/v83/webhook"
 	echo "github.com/theopenlane/echox"
+	"github.com/theopenlane/entx"
 	"github.com/theopenlane/iam/auth"
 	"github.com/theopenlane/utils/contextx"
 
@@ -25,6 +27,7 @@ import (
 	em "github.com/theopenlane/core/internal/entitlements/entmapping"
 	"github.com/theopenlane/core/pkg/entitlements"
 	"github.com/theopenlane/core/pkg/middleware/transaction"
+	models "github.com/theopenlane/core/pkg/openapi"
 )
 
 const (
@@ -69,6 +72,10 @@ var (
 		},
 		[]string{"event_type", "status_code"},
 	)
+
+	errPayloadEmpty = errors.New("payload is empty")
+
+	errMissingSecret = errors.New("webhook secret is missing")
 )
 
 func init() {
@@ -84,6 +91,26 @@ func (h *Handler) WebhookReceiverHandler(ctx echo.Context, openapi *OpenAPIConte
 	req := ctx.Request()
 	res := ctx.Response()
 
+	webhookReq := &models.StripeWebhookRequest{APIVersion: ctx.QueryParam("api_version")}
+
+	if webhookReq.APIVersion != "" && h.Entitlements.Config.StripeWebhookDiscardAPIVersion != "" {
+		if webhookReq.APIVersion == h.Entitlements.Config.StripeWebhookDiscardAPIVersion {
+			webhookResponseCounter.WithLabelValues("api_version_discarded", "200").Inc()
+			log.Debug().Str("api_version", webhookReq.APIVersion).Msg("webhook with discard API version received, ignoring")
+
+			return h.Success(ctx, "webhook ignored - API version being discarded")
+		}
+	}
+
+	if webhookReq.APIVersion != "" && h.Entitlements.Config.StripeWebhookAPIVersion != "" {
+		if webhookReq.APIVersion != h.Entitlements.Config.StripeWebhookAPIVersion {
+			webhookResponseCounter.WithLabelValues("api_version_mismatch", "200").Inc()
+			log.Warn().Str("api_version", webhookReq.APIVersion).Str("expected_version", h.Entitlements.Config.StripeWebhookAPIVersion).Msg("webhook with unexpected API version")
+
+			return h.Success(ctx, "webhook ignored - API version mismatch")
+		}
+	}
+
 	payload, err := io.ReadAll(http.MaxBytesReader(res.Writer, req.Body, maxBodyBytes))
 	if err != nil {
 		webhookResponseCounter.WithLabelValues("payload_exceeded", "500").Inc()
@@ -92,10 +119,28 @@ func (h *Handler) WebhookReceiverHandler(ctx echo.Context, openapi *OpenAPIConte
 		return h.InternalServerError(ctx, err, openapi)
 	}
 
-	event, err := webhook.ConstructEvent(payload, req.Header.Get(stripeSignatureHeaderKey), h.Entitlements.Config.StripeWebhookSecret)
+	log.Info().Msgf("version: %s", webhookReq.APIVersion)
+
+	if payload == nil {
+		webhookResponseCounter.WithLabelValues("empty_payload", "400").Inc()
+		log.Error().Msg("empty payload received")
+
+		return h.BadRequest(ctx, errPayloadEmpty, openapi)
+	}
+
+	webhookSecret := h.Entitlements.Config.GetWebhookSecretForVersion(webhookReq.APIVersion)
+
+	if webhookSecret == "" {
+		webhookResponseCounter.WithLabelValues("missing_webhook_secret", "500").Inc()
+		log.Error().Str("api_version", webhookReq.APIVersion).Msg("missing webhook secret for API version")
+
+		return h.InternalServerError(ctx, errMissingSecret, openapi)
+	}
+
+	event, err := webhook.ConstructEvent(payload, req.Header.Get(stripeSignatureHeaderKey), webhookSecret)
 	if err != nil {
 		webhookResponseCounter.WithLabelValues("event_signature_failure", "400").Inc()
-		log.Error().Err(err).Msg("failed to construct event")
+		log.Error().Err(err).Str("api_version", webhookReq.APIVersion).Msg("failed to construct event")
 
 		return h.BadRequest(ctx, err, openapi)
 	}
@@ -188,7 +233,15 @@ func (h *Handler) HandleEvent(c context.Context, e *stripe.Event) error {
 			return err
 		}
 
-		return h.handleSubscriptionPaused(c, subscription)
+		err = h.handleSubscriptionPaused(c, subscription)
+		if ent.IsNotFound(err) {
+			// if org subscription not found, just log and move on
+			log.Info().Str("subscription_id", subscription.ID).Msg("org subscription not found for paused/deleted subscription, skipping further processing")
+
+			return nil
+		}
+
+		return err
 	default:
 		log.Warn().Str("event_type", string(e.Type)).Msg("unsupported event type")
 
@@ -237,18 +290,16 @@ func (h *Handler) invalidatePersonalAccessTokens(ctx context.Context, orgID stri
 
 // handleSubscriptionPaused handles subscription updated events for paused subscriptions
 func (h *Handler) handleSubscriptionPaused(ctx context.Context, s *stripe.Subscription) (err error) {
-	if s.Customer == nil {
-		log.Error().Msg("subscription has no customer, cannot proceed")
-
-		return ErrSubscriberNotFound
-	}
-
 	ownerID, err := h.syncOrgSubscriptionWithStripe(ctx, s)
 	if err != nil {
 		return
 	}
 
 	if err = h.removeAllModules(ctx, s); err != nil {
+		return
+	}
+
+	if ownerID == nil {
 		return
 	}
 
@@ -262,12 +313,6 @@ func (h *Handler) handleSubscriptionPaused(ctx context.Context, s *stripe.Subscr
 
 // handleSubscriptionUpdated handles subscription updated events
 func (h *Handler) handleSubscriptionUpdated(ctx context.Context, s *stripe.Subscription) error {
-	if s.Customer == nil {
-		log.Error().Msg("subscription has no customer, cannot proceed")
-
-		return ErrSubscriberNotFound
-	}
-
 	_, err := h.syncOrgSubscriptionWithStripe(ctx, s)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to sync org subscription with stripe")
@@ -328,9 +373,6 @@ func getOrgSubscription(ctx context.Context, subscription *stripe.Subscription) 
 						if orgID := entitlements.GetOrganizationIDFromMetadata(subscription.Metadata); orgID != "" {
 							orgSubscription, err = transaction.FromContext(ctx).OrgSubscription.Query().
 								Where(orgsubscription.OwnerID(orgID), orgsubscription.DeletedAtIsNil()).Only(allowCtx)
-							if err == nil {
-								return orgSubscription, nil
-							}
 						}
 					}
 				}
@@ -349,11 +391,30 @@ func getOrgSubscription(ctx context.Context, subscription *stripe.Subscription) 
 				}
 			}
 
-			// if we got here we could not find the org subscription, so just log and return the error
-			log.Warn().Str("subscription_id", subscription.ID).Msg("org subscription not found and no metadata to fallback on")
+			// if we got here we could not find the org subscription
+			// first check to see if the org was deleted already
+			allowCtx = entx.SkipSoftDelete(ctx)
+			if orgSubID := entitlements.GetOrganizationSubscriptionIDFromMetadata(subscription.Metadata); orgSubID != "" {
+				orgSubscription, _ = transaction.FromContext(ctx).OrgSubscription.Query().
+					Where(orgsubscription.ID(orgSubID)).Only(allowCtx)
+				if orgSubscription == nil {
+					// fallback to organization_id
+					if orgID := entitlements.GetOrganizationIDFromMetadata(subscription.Metadata); orgID != "" {
+						orgSubscription, err = transaction.FromContext(ctx).OrgSubscription.Query().
+							Where(orgsubscription.OwnerID(orgID)).Only(allowCtx)
+					}
+				}
+			}
+
+			if orgSubscription == nil {
+				log.Warn().Str("subscription_id", subscription.ID).Msg("org subscription never existed in system")
+			} else {
+				log.Info().Str("subscription_id", subscription.ID).Msg("org subscription found but was already deleted")
+			}
+
 		}
 
-		log.Error().Err(err).Msg("failed to find org subscription")
+		log.Warn().Err(err).Msg("failed to find org subscription")
 
 		return nil, err
 	}
@@ -365,6 +426,15 @@ func getOrgSubscription(ctx context.Context, subscription *stripe.Subscription) 
 // returns the owner (organization) ID of the OrgSubscription to be used for further operations if needed
 func (h *Handler) syncOrgSubscriptionWithStripe(ctx context.Context, subscription *stripe.Subscription) (*string, error) {
 	orgSubscription, err := getOrgSubscription(ctx, subscription)
+
+	// getOrgSubscription exhausts all possible routes to find the org so this is fine
+	if ent.IsNotFound(err) {
+		// no org subscription found, nothing to sync
+		log.Info().Str("subscription_id", subscription.ID).Msg("no org subscription found to sync with stripe subscription")
+
+		return nil, nil
+	}
+
 	if err != nil {
 		return nil, err
 	}

@@ -66,7 +66,7 @@ func (User) Mixin() []ent.Mixin {
 			HumanIdentifierPrefix: "USR",
 			SingleFieldIndex:      true,
 		},
-		emixin.TagMixin{},
+		mixin.TagMixin{},
 		mixin.GraphQLAnnotationMixin{},
 	}
 }
@@ -147,6 +147,26 @@ func (User) Fields() []ent.Field {
 			Values(enums.RoleUser.String()). // add user as a role
 			Default(enums.RoleUser.String()).
 			Optional(),
+		field.String("scim_external_id").
+			Comment("the SCIM external ID for the user").
+			Optional().
+			Nillable(),
+		field.String("scim_username").
+			Comment("the SCIM username for the user").
+			Optional().
+			Nillable(),
+		field.Bool("scim_active").
+			Comment("whether the SCIM user is active").
+			Optional().
+			Default(true),
+		field.String("scim_preferred_language").
+			Comment("the SCIM preferred language for the user").
+			Optional().
+			Nillable(),
+		field.String("scim_locale").
+			Comment("the SCIM locale for the user").
+			Optional().
+			Nillable(),
 	}
 }
 
@@ -255,9 +275,9 @@ func (u User) Edges() []ent.Edge {
 				entgql.MultiOrder(),
 				accessmap.EdgeNoAuthCheck(), // membership edges are handled by the parent
 			),
-		uniqueEdgeTo(&edgeDefinition{
+		edgeToWithPagination(&edgeDefinition{
 			fromSchema: u,
-			name:       "program_owner",
+			name:       "programs_owned",
 			t:          Program.Type,
 		}),
 		defaultEdgeToWithPagination(u, ImpersonationEvent{}),

@@ -12,9 +12,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/theopenlane/core/internal/ent/generated/actionplan"
 	"github.com/theopenlane/core/internal/ent/generated/control"
 	"github.com/theopenlane/core/internal/ent/generated/controlimplementation"
 	"github.com/theopenlane/core/internal/ent/generated/controlobjective"
+	"github.com/theopenlane/core/internal/ent/generated/customtypeenum"
 	"github.com/theopenlane/core/internal/ent/generated/evidence"
 	"github.com/theopenlane/core/internal/ent/generated/group"
 	"github.com/theopenlane/core/internal/ent/generated/internalpolicy"
@@ -133,6 +135,46 @@ func (_u *TaskUpdate) AppendTags(v []string) *TaskUpdate {
 // ClearTags clears the value of the "tags" field.
 func (_u *TaskUpdate) ClearTags() *TaskUpdate {
 	_u.mutation.ClearTags()
+	return _u
+}
+
+// SetTaskKindName sets the "task_kind_name" field.
+func (_u *TaskUpdate) SetTaskKindName(v string) *TaskUpdate {
+	_u.mutation.SetTaskKindName(v)
+	return _u
+}
+
+// SetNillableTaskKindName sets the "task_kind_name" field if the given value is not nil.
+func (_u *TaskUpdate) SetNillableTaskKindName(v *string) *TaskUpdate {
+	if v != nil {
+		_u.SetTaskKindName(*v)
+	}
+	return _u
+}
+
+// ClearTaskKindName clears the value of the "task_kind_name" field.
+func (_u *TaskUpdate) ClearTaskKindName() *TaskUpdate {
+	_u.mutation.ClearTaskKindName()
+	return _u
+}
+
+// SetTaskKindID sets the "task_kind_id" field.
+func (_u *TaskUpdate) SetTaskKindID(v string) *TaskUpdate {
+	_u.mutation.SetTaskKindID(v)
+	return _u
+}
+
+// SetNillableTaskKindID sets the "task_kind_id" field if the given value is not nil.
+func (_u *TaskUpdate) SetNillableTaskKindID(v *string) *TaskUpdate {
+	if v != nil {
+		_u.SetTaskKindID(*v)
+	}
+	return _u
+}
+
+// ClearTaskKindID clears the value of the "task_kind_id" field.
+func (_u *TaskUpdate) ClearTaskKindID() *TaskUpdate {
+	_u.mutation.ClearTaskKindID()
 	return _u
 }
 
@@ -282,6 +324,63 @@ func (_u *TaskUpdate) SetNillableAssignerID(v *string) *TaskUpdate {
 func (_u *TaskUpdate) ClearAssignerID() *TaskUpdate {
 	_u.mutation.ClearAssignerID()
 	return _u
+}
+
+// SetSystemGenerated sets the "system_generated" field.
+func (_u *TaskUpdate) SetSystemGenerated(v bool) *TaskUpdate {
+	_u.mutation.SetSystemGenerated(v)
+	return _u
+}
+
+// SetNillableSystemGenerated sets the "system_generated" field if the given value is not nil.
+func (_u *TaskUpdate) SetNillableSystemGenerated(v *bool) *TaskUpdate {
+	if v != nil {
+		_u.SetSystemGenerated(*v)
+	}
+	return _u
+}
+
+// SetIdempotencyKey sets the "idempotency_key" field.
+func (_u *TaskUpdate) SetIdempotencyKey(v string) *TaskUpdate {
+	_u.mutation.SetIdempotencyKey(v)
+	return _u
+}
+
+// SetNillableIdempotencyKey sets the "idempotency_key" field if the given value is not nil.
+func (_u *TaskUpdate) SetNillableIdempotencyKey(v *string) *TaskUpdate {
+	if v != nil {
+		_u.SetIdempotencyKey(*v)
+	}
+	return _u
+}
+
+// ClearIdempotencyKey clears the value of the "idempotency_key" field.
+func (_u *TaskUpdate) ClearIdempotencyKey() *TaskUpdate {
+	_u.mutation.ClearIdempotencyKey()
+	return _u
+}
+
+// SetExternalReferenceURL sets the "external_reference_url" field.
+func (_u *TaskUpdate) SetExternalReferenceURL(v []string) *TaskUpdate {
+	_u.mutation.SetExternalReferenceURL(v)
+	return _u
+}
+
+// AppendExternalReferenceURL appends value to the "external_reference_url" field.
+func (_u *TaskUpdate) AppendExternalReferenceURL(v []string) *TaskUpdate {
+	_u.mutation.AppendExternalReferenceURL(v)
+	return _u
+}
+
+// ClearExternalReferenceURL clears the value of the "external_reference_url" field.
+func (_u *TaskUpdate) ClearExternalReferenceURL() *TaskUpdate {
+	_u.mutation.ClearExternalReferenceURL()
+	return _u
+}
+
+// SetTaskKind sets the "task_kind" edge to the CustomTypeEnum entity.
+func (_u *TaskUpdate) SetTaskKind(v *CustomTypeEnum) *TaskUpdate {
+	return _u.SetTaskKindID(v.ID)
 }
 
 // SetAssigner sets the "assigner" edge to the User entity.
@@ -444,6 +543,21 @@ func (_u *TaskUpdate) AddControlImplementations(v ...*ControlImplementation) *Ta
 	return _u.AddControlImplementationIDs(ids...)
 }
 
+// AddActionPlanIDs adds the "action_plans" edge to the ActionPlan entity by IDs.
+func (_u *TaskUpdate) AddActionPlanIDs(ids ...string) *TaskUpdate {
+	_u.mutation.AddActionPlanIDs(ids...)
+	return _u
+}
+
+// AddActionPlans adds the "action_plans" edges to the ActionPlan entity.
+func (_u *TaskUpdate) AddActionPlans(v ...*ActionPlan) *TaskUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddActionPlanIDs(ids...)
+}
+
 // AddEvidenceIDs adds the "evidence" edge to the Evidence entity by IDs.
 func (_u *TaskUpdate) AddEvidenceIDs(ids ...string) *TaskUpdate {
 	_u.mutation.AddEvidenceIDs(ids...)
@@ -462,6 +576,12 @@ func (_u *TaskUpdate) AddEvidence(v ...*Evidence) *TaskUpdate {
 // Mutation returns the TaskMutation object of the builder.
 func (_u *TaskUpdate) Mutation() *TaskMutation {
 	return _u.mutation
+}
+
+// ClearTaskKind clears the "task_kind" edge to the CustomTypeEnum entity.
+func (_u *TaskUpdate) ClearTaskKind() *TaskUpdate {
+	_u.mutation.ClearTaskKind()
+	return _u
 }
 
 // ClearAssigner clears the "assigner" edge to the User entity.
@@ -686,6 +806,27 @@ func (_u *TaskUpdate) RemoveControlImplementations(v ...*ControlImplementation) 
 	return _u.RemoveControlImplementationIDs(ids...)
 }
 
+// ClearActionPlans clears all "action_plans" edges to the ActionPlan entity.
+func (_u *TaskUpdate) ClearActionPlans() *TaskUpdate {
+	_u.mutation.ClearActionPlans()
+	return _u
+}
+
+// RemoveActionPlanIDs removes the "action_plans" edge to ActionPlan entities by IDs.
+func (_u *TaskUpdate) RemoveActionPlanIDs(ids ...string) *TaskUpdate {
+	_u.mutation.RemoveActionPlanIDs(ids...)
+	return _u
+}
+
+// RemoveActionPlans removes "action_plans" edges to ActionPlan entities.
+func (_u *TaskUpdate) RemoveActionPlans(v ...*ActionPlan) *TaskUpdate {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveActionPlanIDs(ids...)
+}
+
 // ClearEvidence clears all "evidence" edges to the Evidence entity.
 func (_u *TaskUpdate) ClearEvidence() *TaskUpdate {
 	_u.mutation.ClearEvidence()
@@ -761,6 +902,11 @@ func (_u *TaskUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Task.status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ExternalReferenceURL(); ok {
+		if err := task.ExternalReferenceURLValidator(v); err != nil {
+			return &ValidationError{Name: "external_reference_url", err: fmt.Errorf(`generated: validator failed for field "Task.external_reference_url": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -823,6 +969,12 @@ func (_u *TaskUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.TagsCleared() {
 		_spec.ClearField(task.FieldTags, field.TypeJSON)
 	}
+	if value, ok := _u.mutation.TaskKindName(); ok {
+		_spec.SetField(task.FieldTaskKindName, field.TypeString, value)
+	}
+	if _u.mutation.TaskKindNameCleared() {
+		_spec.ClearField(task.FieldTaskKindName, field.TypeString)
+	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(task.FieldTitle, field.TypeString, value)
 	}
@@ -852,6 +1004,57 @@ func (_u *TaskUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.CompletedCleared() {
 		_spec.ClearField(task.FieldCompleted, field.TypeTime)
+	}
+	if value, ok := _u.mutation.SystemGenerated(); ok {
+		_spec.SetField(task.FieldSystemGenerated, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.IdempotencyKey(); ok {
+		_spec.SetField(task.FieldIdempotencyKey, field.TypeString, value)
+	}
+	if _u.mutation.IdempotencyKeyCleared() {
+		_spec.ClearField(task.FieldIdempotencyKey, field.TypeString)
+	}
+	if value, ok := _u.mutation.ExternalReferenceURL(); ok {
+		_spec.SetField(task.FieldExternalReferenceURL, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedExternalReferenceURL(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, task.FieldExternalReferenceURL, value)
+		})
+	}
+	if _u.mutation.ExternalReferenceURLCleared() {
+		_spec.ClearField(task.FieldExternalReferenceURL, field.TypeJSON)
+	}
+	if _u.mutation.TaskKindCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   task.TaskKindTable,
+			Columns: []string{task.TaskKindColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customtypeenum.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Task
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.TaskKindIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   task.TaskKindTable,
+			Columns: []string{task.TaskKindColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customtypeenum.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Task
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _u.mutation.AssignerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1395,6 +1598,54 @@ func (_u *TaskUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.ActionPlansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.ActionPlansTable,
+			Columns: task.ActionPlansPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(actionplan.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.ActionPlanTasks
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedActionPlansIDs(); len(nodes) > 0 && !_u.mutation.ActionPlansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.ActionPlansTable,
+			Columns: task.ActionPlansPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(actionplan.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.ActionPlanTasks
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ActionPlansIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.ActionPlansTable,
+			Columns: task.ActionPlansPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(actionplan.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.ActionPlanTasks
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.EvidenceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -1557,6 +1808,46 @@ func (_u *TaskUpdateOne) ClearTags() *TaskUpdateOne {
 	return _u
 }
 
+// SetTaskKindName sets the "task_kind_name" field.
+func (_u *TaskUpdateOne) SetTaskKindName(v string) *TaskUpdateOne {
+	_u.mutation.SetTaskKindName(v)
+	return _u
+}
+
+// SetNillableTaskKindName sets the "task_kind_name" field if the given value is not nil.
+func (_u *TaskUpdateOne) SetNillableTaskKindName(v *string) *TaskUpdateOne {
+	if v != nil {
+		_u.SetTaskKindName(*v)
+	}
+	return _u
+}
+
+// ClearTaskKindName clears the value of the "task_kind_name" field.
+func (_u *TaskUpdateOne) ClearTaskKindName() *TaskUpdateOne {
+	_u.mutation.ClearTaskKindName()
+	return _u
+}
+
+// SetTaskKindID sets the "task_kind_id" field.
+func (_u *TaskUpdateOne) SetTaskKindID(v string) *TaskUpdateOne {
+	_u.mutation.SetTaskKindID(v)
+	return _u
+}
+
+// SetNillableTaskKindID sets the "task_kind_id" field if the given value is not nil.
+func (_u *TaskUpdateOne) SetNillableTaskKindID(v *string) *TaskUpdateOne {
+	if v != nil {
+		_u.SetTaskKindID(*v)
+	}
+	return _u
+}
+
+// ClearTaskKindID clears the value of the "task_kind_id" field.
+func (_u *TaskUpdateOne) ClearTaskKindID() *TaskUpdateOne {
+	_u.mutation.ClearTaskKindID()
+	return _u
+}
+
 // SetTitle sets the "title" field.
 func (_u *TaskUpdateOne) SetTitle(v string) *TaskUpdateOne {
 	_u.mutation.SetTitle(v)
@@ -1703,6 +1994,63 @@ func (_u *TaskUpdateOne) SetNillableAssignerID(v *string) *TaskUpdateOne {
 func (_u *TaskUpdateOne) ClearAssignerID() *TaskUpdateOne {
 	_u.mutation.ClearAssignerID()
 	return _u
+}
+
+// SetSystemGenerated sets the "system_generated" field.
+func (_u *TaskUpdateOne) SetSystemGenerated(v bool) *TaskUpdateOne {
+	_u.mutation.SetSystemGenerated(v)
+	return _u
+}
+
+// SetNillableSystemGenerated sets the "system_generated" field if the given value is not nil.
+func (_u *TaskUpdateOne) SetNillableSystemGenerated(v *bool) *TaskUpdateOne {
+	if v != nil {
+		_u.SetSystemGenerated(*v)
+	}
+	return _u
+}
+
+// SetIdempotencyKey sets the "idempotency_key" field.
+func (_u *TaskUpdateOne) SetIdempotencyKey(v string) *TaskUpdateOne {
+	_u.mutation.SetIdempotencyKey(v)
+	return _u
+}
+
+// SetNillableIdempotencyKey sets the "idempotency_key" field if the given value is not nil.
+func (_u *TaskUpdateOne) SetNillableIdempotencyKey(v *string) *TaskUpdateOne {
+	if v != nil {
+		_u.SetIdempotencyKey(*v)
+	}
+	return _u
+}
+
+// ClearIdempotencyKey clears the value of the "idempotency_key" field.
+func (_u *TaskUpdateOne) ClearIdempotencyKey() *TaskUpdateOne {
+	_u.mutation.ClearIdempotencyKey()
+	return _u
+}
+
+// SetExternalReferenceURL sets the "external_reference_url" field.
+func (_u *TaskUpdateOne) SetExternalReferenceURL(v []string) *TaskUpdateOne {
+	_u.mutation.SetExternalReferenceURL(v)
+	return _u
+}
+
+// AppendExternalReferenceURL appends value to the "external_reference_url" field.
+func (_u *TaskUpdateOne) AppendExternalReferenceURL(v []string) *TaskUpdateOne {
+	_u.mutation.AppendExternalReferenceURL(v)
+	return _u
+}
+
+// ClearExternalReferenceURL clears the value of the "external_reference_url" field.
+func (_u *TaskUpdateOne) ClearExternalReferenceURL() *TaskUpdateOne {
+	_u.mutation.ClearExternalReferenceURL()
+	return _u
+}
+
+// SetTaskKind sets the "task_kind" edge to the CustomTypeEnum entity.
+func (_u *TaskUpdateOne) SetTaskKind(v *CustomTypeEnum) *TaskUpdateOne {
+	return _u.SetTaskKindID(v.ID)
 }
 
 // SetAssigner sets the "assigner" edge to the User entity.
@@ -1865,6 +2213,21 @@ func (_u *TaskUpdateOne) AddControlImplementations(v ...*ControlImplementation) 
 	return _u.AddControlImplementationIDs(ids...)
 }
 
+// AddActionPlanIDs adds the "action_plans" edge to the ActionPlan entity by IDs.
+func (_u *TaskUpdateOne) AddActionPlanIDs(ids ...string) *TaskUpdateOne {
+	_u.mutation.AddActionPlanIDs(ids...)
+	return _u
+}
+
+// AddActionPlans adds the "action_plans" edges to the ActionPlan entity.
+func (_u *TaskUpdateOne) AddActionPlans(v ...*ActionPlan) *TaskUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddActionPlanIDs(ids...)
+}
+
 // AddEvidenceIDs adds the "evidence" edge to the Evidence entity by IDs.
 func (_u *TaskUpdateOne) AddEvidenceIDs(ids ...string) *TaskUpdateOne {
 	_u.mutation.AddEvidenceIDs(ids...)
@@ -1883,6 +2246,12 @@ func (_u *TaskUpdateOne) AddEvidence(v ...*Evidence) *TaskUpdateOne {
 // Mutation returns the TaskMutation object of the builder.
 func (_u *TaskUpdateOne) Mutation() *TaskMutation {
 	return _u.mutation
+}
+
+// ClearTaskKind clears the "task_kind" edge to the CustomTypeEnum entity.
+func (_u *TaskUpdateOne) ClearTaskKind() *TaskUpdateOne {
+	_u.mutation.ClearTaskKind()
+	return _u
 }
 
 // ClearAssigner clears the "assigner" edge to the User entity.
@@ -2107,6 +2476,27 @@ func (_u *TaskUpdateOne) RemoveControlImplementations(v ...*ControlImplementatio
 	return _u.RemoveControlImplementationIDs(ids...)
 }
 
+// ClearActionPlans clears all "action_plans" edges to the ActionPlan entity.
+func (_u *TaskUpdateOne) ClearActionPlans() *TaskUpdateOne {
+	_u.mutation.ClearActionPlans()
+	return _u
+}
+
+// RemoveActionPlanIDs removes the "action_plans" edge to ActionPlan entities by IDs.
+func (_u *TaskUpdateOne) RemoveActionPlanIDs(ids ...string) *TaskUpdateOne {
+	_u.mutation.RemoveActionPlanIDs(ids...)
+	return _u
+}
+
+// RemoveActionPlans removes "action_plans" edges to ActionPlan entities.
+func (_u *TaskUpdateOne) RemoveActionPlans(v ...*ActionPlan) *TaskUpdateOne {
+	ids := make([]string, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveActionPlanIDs(ids...)
+}
+
 // ClearEvidence clears all "evidence" edges to the Evidence entity.
 func (_u *TaskUpdateOne) ClearEvidence() *TaskUpdateOne {
 	_u.mutation.ClearEvidence()
@@ -2195,6 +2585,11 @@ func (_u *TaskUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Task.status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ExternalReferenceURL(); ok {
+		if err := task.ExternalReferenceURLValidator(v); err != nil {
+			return &ValidationError{Name: "external_reference_url", err: fmt.Errorf(`generated: validator failed for field "Task.external_reference_url": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -2274,6 +2669,12 @@ func (_u *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) {
 	if _u.mutation.TagsCleared() {
 		_spec.ClearField(task.FieldTags, field.TypeJSON)
 	}
+	if value, ok := _u.mutation.TaskKindName(); ok {
+		_spec.SetField(task.FieldTaskKindName, field.TypeString, value)
+	}
+	if _u.mutation.TaskKindNameCleared() {
+		_spec.ClearField(task.FieldTaskKindName, field.TypeString)
+	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(task.FieldTitle, field.TypeString, value)
 	}
@@ -2303,6 +2704,57 @@ func (_u *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) {
 	}
 	if _u.mutation.CompletedCleared() {
 		_spec.ClearField(task.FieldCompleted, field.TypeTime)
+	}
+	if value, ok := _u.mutation.SystemGenerated(); ok {
+		_spec.SetField(task.FieldSystemGenerated, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.IdempotencyKey(); ok {
+		_spec.SetField(task.FieldIdempotencyKey, field.TypeString, value)
+	}
+	if _u.mutation.IdempotencyKeyCleared() {
+		_spec.ClearField(task.FieldIdempotencyKey, field.TypeString)
+	}
+	if value, ok := _u.mutation.ExternalReferenceURL(); ok {
+		_spec.SetField(task.FieldExternalReferenceURL, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedExternalReferenceURL(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, task.FieldExternalReferenceURL, value)
+		})
+	}
+	if _u.mutation.ExternalReferenceURLCleared() {
+		_spec.ClearField(task.FieldExternalReferenceURL, field.TypeJSON)
+	}
+	if _u.mutation.TaskKindCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   task.TaskKindTable,
+			Columns: []string{task.TaskKindColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customtypeenum.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Task
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.TaskKindIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   task.TaskKindTable,
+			Columns: []string{task.TaskKindColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(customtypeenum.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.Task
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _u.mutation.AssignerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -2841,6 +3293,54 @@ func (_u *TaskUpdateOne) sqlSave(ctx context.Context) (_node *Task, err error) {
 			},
 		}
 		edge.Schema = _u.schemaConfig.ControlImplementationTasks
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ActionPlansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.ActionPlansTable,
+			Columns: task.ActionPlansPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(actionplan.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.ActionPlanTasks
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedActionPlansIDs(); len(nodes) > 0 && !_u.mutation.ActionPlansCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.ActionPlansTable,
+			Columns: task.ActionPlansPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(actionplan.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.ActionPlanTasks
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ActionPlansIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   task.ActionPlansTable,
+			Columns: task.ActionPlansPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(actionplan.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _u.schemaConfig.ActionPlanTasks
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

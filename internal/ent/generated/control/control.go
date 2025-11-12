@@ -88,6 +88,10 @@ const (
 	FieldInternalNotes = "internal_notes"
 	// FieldSystemInternalID holds the string denoting the system_internal_id field in the database.
 	FieldSystemInternalID = "system_internal_id"
+	// FieldControlKindName holds the string denoting the control_kind_name field in the database.
+	FieldControlKindName = "control_kind_name"
+	// FieldControlKindID holds the string denoting the control_kind_id field in the database.
+	FieldControlKindID = "control_kind_id"
 	// FieldRefCode holds the string denoting the ref_code field in the database.
 	FieldRefCode = "ref_code"
 	// FieldStandardID holds the string denoting the standard_id field in the database.
@@ -122,6 +126,8 @@ const (
 	EdgeBlockedGroups = "blocked_groups"
 	// EdgeEditors holds the string denoting the editors edge name in mutations.
 	EdgeEditors = "editors"
+	// EdgeControlKind holds the string denoting the control_kind edge name in mutations.
+	EdgeControlKind = "control_kind"
 	// EdgeStandard holds the string denoting the standard edge name in mutations.
 	EdgeStandard = "standard"
 	// EdgePrograms holds the string denoting the programs edge name in mutations.
@@ -130,6 +136,8 @@ const (
 	EdgeAssets = "assets"
 	// EdgeScans holds the string denoting the scans edge name in mutations.
 	EdgeScans = "scans"
+	// EdgeFindings holds the string denoting the findings edge name in mutations.
+	EdgeFindings = "findings"
 	// EdgeControlImplementations holds the string denoting the control_implementations edge name in mutations.
 	EdgeControlImplementations = "control_implementations"
 	// EdgeSubcontrols holds the string denoting the subcontrols edge name in mutations.
@@ -140,6 +148,8 @@ const (
 	EdgeMappedToControls = "mapped_to_controls"
 	// EdgeMappedFromControls holds the string denoting the mapped_from_controls edge name in mutations.
 	EdgeMappedFromControls = "mapped_from_controls"
+	// EdgeControlMappings holds the string denoting the control_mappings edge name in mutations.
+	EdgeControlMappings = "control_mappings"
 	// Table holds the table name of the control in the database.
 	Table = "controls"
 	// EvidenceTable is the table that holds the evidence relation/edge. The primary key declared below.
@@ -227,6 +237,13 @@ const (
 	// EditorsInverseTable is the table name for the Group entity.
 	// It exists in this package in order to avoid circular dependency with the "group" package.
 	EditorsInverseTable = "groups"
+	// ControlKindTable is the table that holds the control_kind relation/edge.
+	ControlKindTable = "controls"
+	// ControlKindInverseTable is the table name for the CustomTypeEnum entity.
+	// It exists in this package in order to avoid circular dependency with the "customtypeenum" package.
+	ControlKindInverseTable = "custom_type_enums"
+	// ControlKindColumn is the table column denoting the control_kind relation/edge.
+	ControlKindColumn = "control_kind_id"
 	// StandardTable is the table that holds the standard relation/edge.
 	StandardTable = "controls"
 	// StandardInverseTable is the table name for the Standard entity.
@@ -251,6 +268,11 @@ const (
 	ScansInverseTable = "scans"
 	// ScansColumn is the table column denoting the scans relation/edge.
 	ScansColumn = "control_scans"
+	// FindingsTable is the table that holds the findings relation/edge. The primary key declared below.
+	FindingsTable = "finding_controls"
+	// FindingsInverseTable is the table name for the Finding entity.
+	// It exists in this package in order to avoid circular dependency with the "finding" package.
+	FindingsInverseTable = "findings"
 	// ControlImplementationsTable is the table that holds the control_implementations relation/edge. The primary key declared below.
 	ControlImplementationsTable = "control_control_implementations"
 	// ControlImplementationsInverseTable is the table name for the ControlImplementation entity.
@@ -278,6 +300,13 @@ const (
 	// MappedFromControlsInverseTable is the table name for the MappedControl entity.
 	// It exists in this package in order to avoid circular dependency with the "mappedcontrol" package.
 	MappedFromControlsInverseTable = "mapped_controls"
+	// ControlMappingsTable is the table that holds the control_mappings relation/edge.
+	ControlMappingsTable = "finding_controls"
+	// ControlMappingsInverseTable is the table name for the FindingControl entity.
+	// It exists in this package in order to avoid circular dependency with the "findingcontrol" package.
+	ControlMappingsInverseTable = "finding_controls"
+	// ControlMappingsColumn is the table column denoting the control_mappings relation/edge.
+	ControlMappingsColumn = "control_id"
 )
 
 // Columns holds all SQL columns for control fields.
@@ -318,8 +347,19 @@ var Columns = []string{
 	FieldSystemOwned,
 	FieldInternalNotes,
 	FieldSystemInternalID,
+	FieldControlKindName,
+	FieldControlKindID,
 	FieldRefCode,
 	FieldStandardID,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "controls"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"custom_type_enum_controls",
+	"remediation_controls",
+	"review_controls",
+	"vulnerability_controls",
 }
 
 var (
@@ -359,6 +399,9 @@ var (
 	// AssetsPrimaryKey and AssetsColumn2 are the table columns denoting the
 	// primary key for the assets relation (M2M).
 	AssetsPrimaryKey = []string{"control_id", "asset_id"}
+	// FindingsPrimaryKey and FindingsColumn2 are the table columns denoting the
+	// primary key for the findings relation (M2M).
+	FindingsPrimaryKey = []string{"finding_id", "control_id"}
 	// ControlImplementationsPrimaryKey and ControlImplementationsColumn2 are the table columns denoting the
 	// primary key for the control_implementations relation (M2M).
 	ControlImplementationsPrimaryKey = []string{"control_id", "control_implementation_id"}
@@ -380,6 +423,11 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
@@ -389,7 +437,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [13]ent.Hook
+	Hooks        [15]ent.Hook
 	Interceptors [6]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -586,6 +634,16 @@ func BySystemInternalID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSystemInternalID, opts...).ToFunc()
 }
 
+// ByControlKindName orders the results by the control_kind_name field.
+func ByControlKindName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldControlKindName, opts...).ToFunc()
+}
+
+// ByControlKindID orders the results by the control_kind_id field.
+func ByControlKindID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldControlKindID, opts...).ToFunc()
+}
+
 // ByRefCode orders the results by the ref_code field.
 func ByRefCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRefCode, opts...).ToFunc()
@@ -778,6 +836,13 @@ func ByEditors(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByControlKindField orders the results by control_kind field.
+func ByControlKindField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newControlKindStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByStandardField orders the results by standard field.
 func ByStandardField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -824,6 +889,20 @@ func ByScansCount(opts ...sql.OrderTermOption) OrderOption {
 func ByScans(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newScansStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFindingsCount orders the results by findings count.
+func ByFindingsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFindingsStep(), opts...)
+	}
+}
+
+// ByFindings orders the results by findings terms.
+func ByFindings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFindingsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -894,6 +973,20 @@ func ByMappedFromControlsCount(opts ...sql.OrderTermOption) OrderOption {
 func ByMappedFromControls(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newMappedFromControlsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByControlMappingsCount orders the results by control_mappings count.
+func ByControlMappingsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newControlMappingsStep(), opts...)
+	}
+}
+
+// ByControlMappings orders the results by control_mappings terms.
+func ByControlMappings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newControlMappingsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newEvidenceStep() *sqlgraph.Step {
@@ -1001,6 +1094,13 @@ func newEditorsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, EditorsTable, EditorsPrimaryKey...),
 	)
 }
+func newControlKindStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ControlKindInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ControlKindTable, ControlKindColumn),
+	)
+}
 func newStandardStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -1027,6 +1127,13 @@ func newScansStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ScansInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ScansTable, ScansColumn),
+	)
+}
+func newFindingsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FindingsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, FindingsTable, FindingsPrimaryKey...),
 	)
 }
 func newControlImplementationsStep() *sqlgraph.Step {
@@ -1062,6 +1169,13 @@ func newMappedFromControlsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MappedFromControlsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, MappedFromControlsTable, MappedFromControlsPrimaryKey...),
+	)
+}
+func newControlMappingsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ControlMappingsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, ControlMappingsTable, ControlMappingsColumn),
 	)
 }
 

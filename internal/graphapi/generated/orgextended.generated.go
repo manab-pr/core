@@ -210,6 +210,22 @@ func (ec *executionContext) fieldContext_OrganizationTransferOwnershipPayload_or
 				return ec.fieldContext_Organization_exports(ctx, field)
 			case "trustCenterWatermarkConfigs":
 				return ec.fieldContext_Organization_trustCenterWatermarkConfigs(ctx, field)
+			case "assessments":
+				return ec.fieldContext_Organization_assessments(ctx, field)
+			case "assessmentResponses":
+				return ec.fieldContext_Organization_assessmentResponses(ctx, field)
+			case "customTypeEnums":
+				return ec.fieldContext_Organization_customTypeEnums(ctx, field)
+			case "tagDefinitions":
+				return ec.fieldContext_Organization_tagDefinitions(ctx, field)
+			case "remediations":
+				return ec.fieldContext_Organization_remediations(ctx, field)
+			case "findings":
+				return ec.fieldContext_Organization_findings(ctx, field)
+			case "reviews":
+				return ec.fieldContext_Organization_reviews(ctx, field)
+			case "vulnerabilities":
+				return ec.fieldContext_Organization_vulnerabilities(ctx, field)
 			case "members":
 				return ec.fieldContext_Organization_members(ctx, field)
 			}

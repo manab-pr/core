@@ -33,6 +33,37 @@ query GlobalSearch($query: String!) {
         }
       }
     }
+    assessments {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          id
+          name
+          tags
+        }
+      }
+    }
+    assessmentResponses {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          email
+          id
+        }
+      }
+    }
     assets {
       totalCount
       pageInfo {
@@ -135,6 +166,22 @@ query GlobalSearch($query: String!) {
         node {
           id
           tags
+        }
+      }
+    }
+    customTypeEnums {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          id
+          name
+          objectType
         }
       }
     }
@@ -244,6 +291,25 @@ query GlobalSearch($query: String!) {
       edges {
         node {
           id
+          tags
+        }
+      }
+    }
+    findings {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          displayID
+          externalID
+          externalOwnerID
+          id
+          severity
           tags
         }
       }
@@ -525,6 +591,43 @@ query GlobalSearch($query: String!) {
         }
       }
     }
+    remediations {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          displayID
+          externalID
+          externalOwnerID
+          id
+          tags
+          title
+        }
+      }
+    }
+    reviews {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          externalID
+          externalOwnerID
+          id
+          tags
+          title
+        }
+      }
+    }
     risks {
       totalCount
       pageInfo {
@@ -630,6 +733,21 @@ query GlobalSearch($query: String!) {
           email
           id
           tags
+        }
+      }
+    }
+    tagDefinitions {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          id
+          name
         }
       }
     }
@@ -739,6 +857,26 @@ query GlobalSearch($query: String!) {
       edges {
         node {
           id
+          tags
+        }
+      }
+    }
+    vulnerabilities {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        node {
+          cveID
+          displayID
+          externalID
+          externalOwnerID
+          id
+          severity
           tags
         }
       }

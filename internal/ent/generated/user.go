@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/theopenlane/core/internal/ent/generated/file"
-	"github.com/theopenlane/core/internal/ent/generated/program"
 	"github.com/theopenlane/core/internal/ent/generated/user"
 	"github.com/theopenlane/core/internal/ent/generated/usersetting"
 	"github.com/theopenlane/core/pkg/enums"
@@ -64,6 +63,16 @@ type User struct {
 	AuthProvider enums.AuthProvider `json:"auth_provider,omitempty"`
 	// the user's role
 	Role enums.Role `json:"role,omitempty"`
+	// the SCIM external ID for the user
+	ScimExternalID *string `json:"scim_external_id,omitempty"`
+	// the SCIM username for the user
+	ScimUsername *string `json:"scim_username,omitempty"`
+	// whether the SCIM user is active
+	ScimActive bool `json:"scim_active,omitempty"`
+	// the SCIM preferred language for the user
+	ScimPreferredLanguage *string `json:"scim_preferred_language,omitempty"`
+	// the SCIM locale for the user
+	ScimLocale *string `json:"scim_locale,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -106,8 +115,8 @@ type UserEdges struct {
 	AssigneeTasks []*Task `json:"assignee_tasks,omitempty"`
 	// Programs holds the value of the programs edge.
 	Programs []*Program `json:"programs,omitempty"`
-	// ProgramOwner holds the value of the program_owner edge.
-	ProgramOwner *Program `json:"program_owner,omitempty"`
+	// ProgramsOwned holds the value of the programs_owned edge.
+	ProgramsOwned []*Program `json:"programs_owned,omitempty"`
 	// ImpersonationEvents holds the value of the impersonation_events edge.
 	ImpersonationEvents []*ImpersonationEvent `json:"impersonation_events,omitempty"`
 	// TargetedImpersonations holds the value of the targeted_impersonations edge.
@@ -139,6 +148,7 @@ type UserEdges struct {
 	namedAssignerTasks           map[string][]*Task
 	namedAssigneeTasks           map[string][]*Task
 	namedPrograms                map[string][]*Program
+	namedProgramsOwned           map[string][]*Program
 	namedImpersonationEvents     map[string][]*ImpersonationEvent
 	namedTargetedImpersonations  map[string][]*ImpersonationEvent
 	namedGroupMemberships        map[string][]*GroupMembership
@@ -303,15 +313,13 @@ func (e UserEdges) ProgramsOrErr() ([]*Program, error) {
 	return nil, &NotLoadedError{edge: "programs"}
 }
 
-// ProgramOwnerOrErr returns the ProgramOwner value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) ProgramOwnerOrErr() (*Program, error) {
-	if e.ProgramOwner != nil {
-		return e.ProgramOwner, nil
-	} else if e.loadedTypes[17] {
-		return nil, &NotFoundError{label: program.Label}
+// ProgramsOwnedOrErr returns the ProgramsOwned value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ProgramsOwnedOrErr() ([]*Program, error) {
+	if e.loadedTypes[17] {
+		return e.ProgramsOwned, nil
 	}
-	return nil, &NotLoadedError{edge: "program_owner"}
+	return nil, &NotLoadedError{edge: "programs_owned"}
 }
 
 // ImpersonationEventsOrErr returns the ImpersonationEvents value or an error if the edge
@@ -366,7 +374,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldTags:
 			values[i] = new([]byte)
-		case user.FieldID, user.FieldCreatedBy, user.FieldUpdatedBy, user.FieldDeletedBy, user.FieldDisplayID, user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldDisplayName, user.FieldAvatarRemoteURL, user.FieldAvatarLocalFileID, user.FieldLastLoginProvider, user.FieldPassword, user.FieldSub, user.FieldAuthProvider, user.FieldRole:
+		case user.FieldScimActive:
+			values[i] = new(sql.NullBool)
+		case user.FieldID, user.FieldCreatedBy, user.FieldUpdatedBy, user.FieldDeletedBy, user.FieldDisplayID, user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldDisplayName, user.FieldAvatarRemoteURL, user.FieldAvatarLocalFileID, user.FieldLastLoginProvider, user.FieldPassword, user.FieldSub, user.FieldAuthProvider, user.FieldRole, user.FieldScimExternalID, user.FieldScimUsername, user.FieldScimPreferredLanguage, user.FieldScimLocale:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldDeletedAt, user.FieldAvatarUpdatedAt, user.FieldLastSeen:
 			values[i] = new(sql.NullTime)
@@ -524,6 +534,40 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Role = enums.Role(value.String)
 			}
+		case user.FieldScimExternalID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field scim_external_id", values[i])
+			} else if value.Valid {
+				_m.ScimExternalID = new(string)
+				*_m.ScimExternalID = value.String
+			}
+		case user.FieldScimUsername:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field scim_username", values[i])
+			} else if value.Valid {
+				_m.ScimUsername = new(string)
+				*_m.ScimUsername = value.String
+			}
+		case user.FieldScimActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field scim_active", values[i])
+			} else if value.Valid {
+				_m.ScimActive = value.Bool
+			}
+		case user.FieldScimPreferredLanguage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field scim_preferred_language", values[i])
+			} else if value.Valid {
+				_m.ScimPreferredLanguage = new(string)
+				*_m.ScimPreferredLanguage = value.String
+			}
+		case user.FieldScimLocale:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field scim_locale", values[i])
+			} else if value.Valid {
+				_m.ScimLocale = new(string)
+				*_m.ScimLocale = value.String
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -622,9 +666,9 @@ func (_m *User) QueryPrograms() *ProgramQuery {
 	return NewUserClient(_m.config).QueryPrograms(_m)
 }
 
-// QueryProgramOwner queries the "program_owner" edge of the User entity.
-func (_m *User) QueryProgramOwner() *ProgramQuery {
-	return NewUserClient(_m.config).QueryProgramOwner(_m)
+// QueryProgramsOwned queries the "programs_owned" edge of the User entity.
+func (_m *User) QueryProgramsOwned() *ProgramQuery {
+	return NewUserClient(_m.config).QueryProgramsOwned(_m)
 }
 
 // QueryImpersonationEvents queries the "impersonation_events" edge of the User entity.
@@ -744,6 +788,29 @@ func (_m *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("role=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Role))
+	builder.WriteString(", ")
+	if v := _m.ScimExternalID; v != nil {
+		builder.WriteString("scim_external_id=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.ScimUsername; v != nil {
+		builder.WriteString("scim_username=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("scim_active=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ScimActive))
+	builder.WriteString(", ")
+	if v := _m.ScimPreferredLanguage; v != nil {
+		builder.WriteString("scim_preferred_language=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.ScimLocale; v != nil {
+		builder.WriteString("scim_locale=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -1105,6 +1172,30 @@ func (_m *User) appendNamedPrograms(name string, edges ...*Program) {
 		_m.Edges.namedPrograms[name] = []*Program{}
 	} else {
 		_m.Edges.namedPrograms[name] = append(_m.Edges.namedPrograms[name], edges...)
+	}
+}
+
+// NamedProgramsOwned returns the ProgramsOwned named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *User) NamedProgramsOwned(name string) ([]*Program, error) {
+	if _m.Edges.namedProgramsOwned == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedProgramsOwned[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *User) appendNamedProgramsOwned(name string, edges ...*Program) {
+	if _m.Edges.namedProgramsOwned == nil {
+		_m.Edges.namedProgramsOwned = make(map[string][]*Program)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedProgramsOwned[name] = []*Program{}
+	} else {
+		_m.Edges.namedProgramsOwned[name] = append(_m.Edges.namedProgramsOwned[name], edges...)
 	}
 }
 

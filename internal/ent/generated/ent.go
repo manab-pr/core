@@ -15,6 +15,10 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/actionplan"
 	"github.com/theopenlane/core/internal/ent/generated/actionplanhistory"
 	"github.com/theopenlane/core/internal/ent/generated/apitoken"
+	"github.com/theopenlane/core/internal/ent/generated/assessment"
+	"github.com/theopenlane/core/internal/ent/generated/assessmenthistory"
+	"github.com/theopenlane/core/internal/ent/generated/assessmentresponse"
+	"github.com/theopenlane/core/internal/ent/generated/assessmentresponsehistory"
 	"github.com/theopenlane/core/internal/ent/generated/asset"
 	"github.com/theopenlane/core/internal/ent/generated/assethistory"
 	"github.com/theopenlane/core/internal/ent/generated/contact"
@@ -27,6 +31,7 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/controlobjectivehistory"
 	"github.com/theopenlane/core/internal/ent/generated/customdomain"
 	"github.com/theopenlane/core/internal/ent/generated/customdomainhistory"
+	"github.com/theopenlane/core/internal/ent/generated/customtypeenum"
 	"github.com/theopenlane/core/internal/ent/generated/dnsverification"
 	"github.com/theopenlane/core/internal/ent/generated/dnsverificationhistory"
 	"github.com/theopenlane/core/internal/ent/generated/documentdata"
@@ -43,6 +48,10 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/file"
 	"github.com/theopenlane/core/internal/ent/generated/filedownloadtoken"
 	"github.com/theopenlane/core/internal/ent/generated/filehistory"
+	"github.com/theopenlane/core/internal/ent/generated/finding"
+	"github.com/theopenlane/core/internal/ent/generated/findingcontrol"
+	"github.com/theopenlane/core/internal/ent/generated/findingcontrolhistory"
+	"github.com/theopenlane/core/internal/ent/generated/findinghistory"
 	"github.com/theopenlane/core/internal/ent/generated/group"
 	"github.com/theopenlane/core/internal/ent/generated/grouphistory"
 	"github.com/theopenlane/core/internal/ent/generated/groupmembership"
@@ -91,6 +100,10 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/programhistory"
 	"github.com/theopenlane/core/internal/ent/generated/programmembership"
 	"github.com/theopenlane/core/internal/ent/generated/programmembershiphistory"
+	"github.com/theopenlane/core/internal/ent/generated/remediation"
+	"github.com/theopenlane/core/internal/ent/generated/remediationhistory"
+	"github.com/theopenlane/core/internal/ent/generated/review"
+	"github.com/theopenlane/core/internal/ent/generated/reviewhistory"
 	"github.com/theopenlane/core/internal/ent/generated/risk"
 	"github.com/theopenlane/core/internal/ent/generated/riskhistory"
 	"github.com/theopenlane/core/internal/ent/generated/scan"
@@ -105,6 +118,7 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/subprocessor"
 	"github.com/theopenlane/core/internal/ent/generated/subprocessorhistory"
 	"github.com/theopenlane/core/internal/ent/generated/subscriber"
+	"github.com/theopenlane/core/internal/ent/generated/tagdefinition"
 	"github.com/theopenlane/core/internal/ent/generated/task"
 	"github.com/theopenlane/core/internal/ent/generated/taskhistory"
 	"github.com/theopenlane/core/internal/ent/generated/template"
@@ -126,6 +140,8 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/userhistory"
 	"github.com/theopenlane/core/internal/ent/generated/usersetting"
 	"github.com/theopenlane/core/internal/ent/generated/usersettinghistory"
+	"github.com/theopenlane/core/internal/ent/generated/vulnerability"
+	"github.com/theopenlane/core/internal/ent/generated/vulnerabilityhistory"
 	"github.com/theopenlane/core/internal/ent/generated/webauthn"
 )
 
@@ -190,6 +206,10 @@ func checkColumn(t, c string) error {
 			apitoken.Table:                          apitoken.ValidColumn,
 			actionplan.Table:                        actionplan.ValidColumn,
 			actionplanhistory.Table:                 actionplanhistory.ValidColumn,
+			assessment.Table:                        assessment.ValidColumn,
+			assessmenthistory.Table:                 assessmenthistory.ValidColumn,
+			assessmentresponse.Table:                assessmentresponse.ValidColumn,
+			assessmentresponsehistory.Table:         assessmentresponsehistory.ValidColumn,
 			asset.Table:                             asset.ValidColumn,
 			assethistory.Table:                      assethistory.ValidColumn,
 			contact.Table:                           contact.ValidColumn,
@@ -202,6 +222,7 @@ func checkColumn(t, c string) error {
 			controlobjectivehistory.Table:           controlobjectivehistory.ValidColumn,
 			customdomain.Table:                      customdomain.ValidColumn,
 			customdomainhistory.Table:               customdomainhistory.ValidColumn,
+			customtypeenum.Table:                    customtypeenum.ValidColumn,
 			dnsverification.Table:                   dnsverification.ValidColumn,
 			dnsverificationhistory.Table:            dnsverificationhistory.ValidColumn,
 			documentdata.Table:                      documentdata.ValidColumn,
@@ -218,6 +239,10 @@ func checkColumn(t, c string) error {
 			file.Table:                              file.ValidColumn,
 			filedownloadtoken.Table:                 filedownloadtoken.ValidColumn,
 			filehistory.Table:                       filehistory.ValidColumn,
+			finding.Table:                           finding.ValidColumn,
+			findingcontrol.Table:                    findingcontrol.ValidColumn,
+			findingcontrolhistory.Table:             findingcontrolhistory.ValidColumn,
+			findinghistory.Table:                    findinghistory.ValidColumn,
 			group.Table:                             group.ValidColumn,
 			grouphistory.Table:                      grouphistory.ValidColumn,
 			groupmembership.Table:                   groupmembership.ValidColumn,
@@ -266,6 +291,10 @@ func checkColumn(t, c string) error {
 			programhistory.Table:                    programhistory.ValidColumn,
 			programmembership.Table:                 programmembership.ValidColumn,
 			programmembershiphistory.Table:          programmembershiphistory.ValidColumn,
+			remediation.Table:                       remediation.ValidColumn,
+			remediationhistory.Table:                remediationhistory.ValidColumn,
+			review.Table:                            review.ValidColumn,
+			reviewhistory.Table:                     reviewhistory.ValidColumn,
 			risk.Table:                              risk.ValidColumn,
 			riskhistory.Table:                       riskhistory.ValidColumn,
 			scan.Table:                              scan.ValidColumn,
@@ -281,6 +310,7 @@ func checkColumn(t, c string) error {
 			subprocessorhistory.Table:               subprocessorhistory.ValidColumn,
 			subscriber.Table:                        subscriber.ValidColumn,
 			tfasetting.Table:                        tfasetting.ValidColumn,
+			tagdefinition.Table:                     tagdefinition.ValidColumn,
 			task.Table:                              task.ValidColumn,
 			taskhistory.Table:                       taskhistory.ValidColumn,
 			template.Table:                          template.ValidColumn,
@@ -301,6 +331,8 @@ func checkColumn(t, c string) error {
 			userhistory.Table:                       userhistory.ValidColumn,
 			usersetting.Table:                       usersetting.ValidColumn,
 			usersettinghistory.Table:                usersettinghistory.ValidColumn,
+			vulnerability.Table:                     vulnerability.ValidColumn,
+			vulnerabilityhistory.Table:              vulnerabilityhistory.ValidColumn,
 			webauthn.Table:                          webauthn.ValidColumn,
 		})
 	})

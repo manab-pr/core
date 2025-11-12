@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Event is an interface representing the structure of an instance of an event
@@ -157,7 +158,8 @@ func (e *BaseEvent) SetContext(ctx context.Context) {
 	e.mu.Lock() // Write lock
 	defer e.mu.Unlock()
 
-	zerolog.Ctx(ctx).UpdateContext(func(c zerolog.Context) zerolog.Context {
+	logger := log.Logger.With().Logger()
+	logger.UpdateContext(func(c zerolog.Context) zerolog.Context {
 		return c.Str("event-topic", e.Topic())
 	})
 

@@ -114,7 +114,9 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"control_scans",
 	"entity_scans",
+	"finding_scans",
 	"risk_scans",
+	"vulnerability_scans",
 }
 
 var (
@@ -153,7 +155,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [8]ent.Hook
+	Hooks        [9]ent.Hook
 	Interceptors [3]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

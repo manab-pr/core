@@ -13,9 +13,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/theopenlane/core/internal/ent/generated/actionplan"
 	"github.com/theopenlane/core/internal/ent/generated/control"
 	"github.com/theopenlane/core/internal/ent/generated/controlimplementation"
 	"github.com/theopenlane/core/internal/ent/generated/controlobjective"
+	"github.com/theopenlane/core/internal/ent/generated/customtypeenum"
 	"github.com/theopenlane/core/internal/ent/generated/evidence"
 	"github.com/theopenlane/core/internal/ent/generated/group"
 	"github.com/theopenlane/core/internal/ent/generated/internalpolicy"
@@ -40,6 +42,7 @@ type TaskQuery struct {
 	inters                          []Interceptor
 	predicates                      []predicate.Task
 	withOwner                       *OrganizationQuery
+	withTaskKind                    *CustomTypeEnumQuery
 	withAssigner                    *UserQuery
 	withAssignee                    *UserQuery
 	withComments                    *NoteQuery
@@ -52,7 +55,9 @@ type TaskQuery struct {
 	withPrograms                    *ProgramQuery
 	withRisks                       *RiskQuery
 	withControlImplementations      *ControlImplementationQuery
+	withActionPlans                 *ActionPlanQuery
 	withEvidence                    *EvidenceQuery
+	withFKs                         bool
 	loadTotal                       []func(context.Context, []*Task) error
 	modifiers                       []func(*sql.Selector)
 	withNamedComments               map[string]*NoteQuery
@@ -65,6 +70,7 @@ type TaskQuery struct {
 	withNamedPrograms               map[string]*ProgramQuery
 	withNamedRisks                  map[string]*RiskQuery
 	withNamedControlImplementations map[string]*ControlImplementationQuery
+	withNamedActionPlans            map[string]*ActionPlanQuery
 	withNamedEvidence               map[string]*EvidenceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -120,6 +126,31 @@ func (_q *TaskQuery) QueryOwner() *OrganizationQuery {
 		)
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.Organization
+		step.Edge.Schema = schemaConfig.Task
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTaskKind chains the current query on the "task_kind" edge.
+func (_q *TaskQuery) QueryTaskKind() *CustomTypeEnumQuery {
+	query := (&CustomTypeEnumClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, selector),
+			sqlgraph.To(customtypeenum.Table, customtypeenum.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, task.TaskKindTable, task.TaskKindColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.CustomTypeEnum
 		step.Edge.Schema = schemaConfig.Task
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -427,6 +458,31 @@ func (_q *TaskQuery) QueryControlImplementations() *ControlImplementationQuery {
 	return query
 }
 
+// QueryActionPlans chains the current query on the "action_plans" edge.
+func (_q *TaskQuery) QueryActionPlans() *ActionPlanQuery {
+	query := (&ActionPlanClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(task.Table, task.FieldID, selector),
+			sqlgraph.To(actionplan.Table, actionplan.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, task.ActionPlansTable, task.ActionPlansPrimaryKey...),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.ActionPlan
+		step.Edge.Schema = schemaConfig.ActionPlanTasks
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryEvidence chains the current query on the "evidence" edge.
 func (_q *TaskQuery) QueryEvidence() *EvidenceQuery {
 	query := (&EvidenceClient{config: _q.config}).Query()
@@ -645,6 +701,7 @@ func (_q *TaskQuery) Clone() *TaskQuery {
 		inters:                     append([]Interceptor{}, _q.inters...),
 		predicates:                 append([]predicate.Task{}, _q.predicates...),
 		withOwner:                  _q.withOwner.Clone(),
+		withTaskKind:               _q.withTaskKind.Clone(),
 		withAssigner:               _q.withAssigner.Clone(),
 		withAssignee:               _q.withAssignee.Clone(),
 		withComments:               _q.withComments.Clone(),
@@ -657,6 +714,7 @@ func (_q *TaskQuery) Clone() *TaskQuery {
 		withPrograms:               _q.withPrograms.Clone(),
 		withRisks:                  _q.withRisks.Clone(),
 		withControlImplementations: _q.withControlImplementations.Clone(),
+		withActionPlans:            _q.withActionPlans.Clone(),
 		withEvidence:               _q.withEvidence.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
@@ -673,6 +731,17 @@ func (_q *TaskQuery) WithOwner(opts ...func(*OrganizationQuery)) *TaskQuery {
 		opt(query)
 	}
 	_q.withOwner = query
+	return _q
+}
+
+// WithTaskKind tells the query-builder to eager-load the nodes that are connected to
+// the "task_kind" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *TaskQuery) WithTaskKind(opts ...func(*CustomTypeEnumQuery)) *TaskQuery {
+	query := (&CustomTypeEnumClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withTaskKind = query
 	return _q
 }
 
@@ -808,6 +877,17 @@ func (_q *TaskQuery) WithControlImplementations(opts ...func(*ControlImplementat
 	return _q
 }
 
+// WithActionPlans tells the query-builder to eager-load the nodes that are connected to
+// the "action_plans" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *TaskQuery) WithActionPlans(opts ...func(*ActionPlanQuery)) *TaskQuery {
+	query := (&ActionPlanClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withActionPlans = query
+	return _q
+}
+
 // WithEvidence tells the query-builder to eager-load the nodes that are connected to
 // the "evidence" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *TaskQuery) WithEvidence(opts ...func(*EvidenceQuery)) *TaskQuery {
@@ -902,9 +982,11 @@ func (_q *TaskQuery) prepareQuery(ctx context.Context) error {
 func (_q *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, error) {
 	var (
 		nodes       = []*Task{}
+		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [14]bool{
+		loadedTypes = [16]bool{
 			_q.withOwner != nil,
+			_q.withTaskKind != nil,
 			_q.withAssigner != nil,
 			_q.withAssignee != nil,
 			_q.withComments != nil,
@@ -917,9 +999,13 @@ func (_q *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 			_q.withPrograms != nil,
 			_q.withRisks != nil,
 			_q.withControlImplementations != nil,
+			_q.withActionPlans != nil,
 			_q.withEvidence != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, task.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Task).scanValues(nil, columns)
 	}
@@ -946,6 +1032,12 @@ func (_q *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 	if query := _q.withOwner; query != nil {
 		if err := _q.loadOwner(ctx, query, nodes, nil,
 			func(n *Task, e *Organization) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withTaskKind; query != nil {
+		if err := _q.loadTaskKind(ctx, query, nodes, nil,
+			func(n *Task, e *CustomTypeEnum) { n.Edges.TaskKind = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1033,6 +1125,13 @@ func (_q *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 			return nil, err
 		}
 	}
+	if query := _q.withActionPlans; query != nil {
+		if err := _q.loadActionPlans(ctx, query, nodes,
+			func(n *Task) { n.Edges.ActionPlans = []*ActionPlan{} },
+			func(n *Task, e *ActionPlan) { n.Edges.ActionPlans = append(n.Edges.ActionPlans, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withEvidence; query != nil {
 		if err := _q.loadEvidence(ctx, query, nodes,
 			func(n *Task) { n.Edges.Evidence = []*Evidence{} },
@@ -1110,6 +1209,13 @@ func (_q *TaskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Task, e
 			return nil, err
 		}
 	}
+	for name, query := range _q.withNamedActionPlans {
+		if err := _q.loadActionPlans(ctx, query, nodes,
+			func(n *Task) { n.appendNamedActionPlans(name) },
+			func(n *Task, e *ActionPlan) { n.appendNamedActionPlans(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range _q.withNamedEvidence {
 		if err := _q.loadEvidence(ctx, query, nodes,
 			func(n *Task) { n.appendNamedEvidence(name) },
@@ -1147,6 +1253,35 @@ func (_q *TaskQuery) loadOwner(ctx context.Context, query *OrganizationQuery, no
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "owner_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *TaskQuery) loadTaskKind(ctx context.Context, query *CustomTypeEnumQuery, nodes []*Task, init func(*Task), assign func(*Task, *CustomTypeEnum)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Task)
+	for i := range nodes {
+		fk := nodes[i].TaskKindID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(customtypeenum.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "task_kind_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -1801,6 +1936,68 @@ func (_q *TaskQuery) loadControlImplementations(ctx context.Context, query *Cont
 	}
 	return nil
 }
+func (_q *TaskQuery) loadActionPlans(ctx context.Context, query *ActionPlanQuery, nodes []*Task, init func(*Task), assign func(*Task, *ActionPlan)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*Task)
+	nids := make(map[string]map[*Task]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(task.ActionPlansTable)
+		joinT.Schema(_q.schemaConfig.ActionPlanTasks)
+		s.Join(joinT).On(s.C(actionplan.FieldID), joinT.C(task.ActionPlansPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(task.ActionPlansPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(task.ActionPlansPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Task]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ActionPlan](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "action_plans" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 func (_q *TaskQuery) loadEvidence(ctx context.Context, query *EvidenceQuery, nodes []*Task, init func(*Task), assign func(*Task, *Evidence)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*Task)
@@ -1896,6 +2093,9 @@ func (_q *TaskQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withOwner != nil {
 			_spec.Node.AddColumnOnce(task.FieldOwnerID)
+		}
+		if _q.withTaskKind != nil {
+			_spec.Node.AddColumnOnce(task.FieldTaskKindID)
 		}
 		if _q.withAssigner != nil {
 			_spec.Node.AddColumnOnce(task.FieldAssignerID)
@@ -2108,6 +2308,20 @@ func (_q *TaskQuery) WithNamedControlImplementations(name string, opts ...func(*
 		_q.withNamedControlImplementations = make(map[string]*ControlImplementationQuery)
 	}
 	_q.withNamedControlImplementations[name] = query
+	return _q
+}
+
+// WithNamedActionPlans tells the query-builder to eager-load the nodes that are connected to the "action_plans"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *TaskQuery) WithNamedActionPlans(name string, opts ...func(*ActionPlanQuery)) *TaskQuery {
+	query := (&ActionPlanClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedActionPlans == nil {
+		_q.withNamedActionPlans = make(map[string]*ActionPlanQuery)
+	}
+	_q.withNamedActionPlans[name] = query
 	return _q
 }
 

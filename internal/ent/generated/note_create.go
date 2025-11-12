@@ -12,10 +12,14 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/theopenlane/core/internal/ent/generated/control"
 	"github.com/theopenlane/core/internal/ent/generated/file"
+	"github.com/theopenlane/core/internal/ent/generated/internalpolicy"
 	"github.com/theopenlane/core/internal/ent/generated/note"
 	"github.com/theopenlane/core/internal/ent/generated/organization"
+	"github.com/theopenlane/core/internal/ent/generated/procedure"
+	"github.com/theopenlane/core/internal/ent/generated/risk"
 	"github.com/theopenlane/core/internal/ent/generated/subcontrol"
 	"github.com/theopenlane/core/internal/ent/generated/task"
+	"github.com/theopenlane/core/internal/ent/generated/trustcenter"
 )
 
 // NoteCreate is the builder for creating a Note entity.
@@ -209,6 +213,82 @@ func (_c *NoteCreate) SetNillableSubcontrolID(id *string) *NoteCreate {
 // SetSubcontrol sets the "subcontrol" edge to the Subcontrol entity.
 func (_c *NoteCreate) SetSubcontrol(v *Subcontrol) *NoteCreate {
 	return _c.SetSubcontrolID(v.ID)
+}
+
+// SetProcedureID sets the "procedure" edge to the Procedure entity by ID.
+func (_c *NoteCreate) SetProcedureID(id string) *NoteCreate {
+	_c.mutation.SetProcedureID(id)
+	return _c
+}
+
+// SetNillableProcedureID sets the "procedure" edge to the Procedure entity by ID if the given value is not nil.
+func (_c *NoteCreate) SetNillableProcedureID(id *string) *NoteCreate {
+	if id != nil {
+		_c = _c.SetProcedureID(*id)
+	}
+	return _c
+}
+
+// SetProcedure sets the "procedure" edge to the Procedure entity.
+func (_c *NoteCreate) SetProcedure(v *Procedure) *NoteCreate {
+	return _c.SetProcedureID(v.ID)
+}
+
+// SetRiskID sets the "risk" edge to the Risk entity by ID.
+func (_c *NoteCreate) SetRiskID(id string) *NoteCreate {
+	_c.mutation.SetRiskID(id)
+	return _c
+}
+
+// SetNillableRiskID sets the "risk" edge to the Risk entity by ID if the given value is not nil.
+func (_c *NoteCreate) SetNillableRiskID(id *string) *NoteCreate {
+	if id != nil {
+		_c = _c.SetRiskID(*id)
+	}
+	return _c
+}
+
+// SetRisk sets the "risk" edge to the Risk entity.
+func (_c *NoteCreate) SetRisk(v *Risk) *NoteCreate {
+	return _c.SetRiskID(v.ID)
+}
+
+// SetInternalPolicyID sets the "internal_policy" edge to the InternalPolicy entity by ID.
+func (_c *NoteCreate) SetInternalPolicyID(id string) *NoteCreate {
+	_c.mutation.SetInternalPolicyID(id)
+	return _c
+}
+
+// SetNillableInternalPolicyID sets the "internal_policy" edge to the InternalPolicy entity by ID if the given value is not nil.
+func (_c *NoteCreate) SetNillableInternalPolicyID(id *string) *NoteCreate {
+	if id != nil {
+		_c = _c.SetInternalPolicyID(*id)
+	}
+	return _c
+}
+
+// SetInternalPolicy sets the "internal_policy" edge to the InternalPolicy entity.
+func (_c *NoteCreate) SetInternalPolicy(v *InternalPolicy) *NoteCreate {
+	return _c.SetInternalPolicyID(v.ID)
+}
+
+// SetTrustCenterID sets the "trust_center" edge to the TrustCenter entity by ID.
+func (_c *NoteCreate) SetTrustCenterID(id string) *NoteCreate {
+	_c.mutation.SetTrustCenterID(id)
+	return _c
+}
+
+// SetNillableTrustCenterID sets the "trust_center" edge to the TrustCenter entity by ID if the given value is not nil.
+func (_c *NoteCreate) SetNillableTrustCenterID(id *string) *NoteCreate {
+	if id != nil {
+		_c = _c.SetTrustCenterID(*id)
+	}
+	return _c
+}
+
+// SetTrustCenter sets the "trust_center" edge to the TrustCenter entity.
+func (_c *NoteCreate) SetTrustCenter(v *TrustCenter) *NoteCreate {
+	return _c.SetTrustCenterID(v.ID)
 }
 
 // AddFileIDs adds the "files" edge to the File entity by IDs.
@@ -448,6 +528,78 @@ func (_c *NoteCreate) createSpec() (*Note, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.subcontrol_comments = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ProcedureIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   note.ProcedureTable,
+			Columns: []string{note.ProcedureColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(procedure.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _c.schemaConfig.Note
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.procedure_comments = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RiskIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   note.RiskTable,
+			Columns: []string{note.RiskColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _c.schemaConfig.Note
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.risk_comments = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.InternalPolicyIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   note.InternalPolicyTable,
+			Columns: []string{note.InternalPolicyColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(internalpolicy.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _c.schemaConfig.Note
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.internal_policy_comments = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.TrustCenterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   note.TrustCenterTable,
+			Columns: []string{note.TrustCenterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trustcenter.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = _c.schemaConfig.Note
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.trust_center_posts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.FilesIDs(); len(nodes) > 0 {

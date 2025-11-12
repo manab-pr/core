@@ -185,6 +185,22 @@ const (
 	EdgeTrustCenterWatermarkConfigs = "trust_center_watermark_configs"
 	// EdgeImpersonationEvents holds the string denoting the impersonation_events edge name in mutations.
 	EdgeImpersonationEvents = "impersonation_events"
+	// EdgeAssessments holds the string denoting the assessments edge name in mutations.
+	EdgeAssessments = "assessments"
+	// EdgeAssessmentResponses holds the string denoting the assessment_responses edge name in mutations.
+	EdgeAssessmentResponses = "assessment_responses"
+	// EdgeCustomTypeEnums holds the string denoting the custom_type_enums edge name in mutations.
+	EdgeCustomTypeEnums = "custom_type_enums"
+	// EdgeTagDefinitions holds the string denoting the tag_definitions edge name in mutations.
+	EdgeTagDefinitions = "tag_definitions"
+	// EdgeRemediations holds the string denoting the remediations edge name in mutations.
+	EdgeRemediations = "remediations"
+	// EdgeFindings holds the string denoting the findings edge name in mutations.
+	EdgeFindings = "findings"
+	// EdgeReviews holds the string denoting the reviews edge name in mutations.
+	EdgeReviews = "reviews"
+	// EdgeVulnerabilities holds the string denoting the vulnerabilities edge name in mutations.
+	EdgeVulnerabilities = "vulnerabilities"
 	// EdgeMembers holds the string denoting the members edge name in mutations.
 	EdgeMembers = "members"
 	// Table holds the table name of the organization in the database.
@@ -651,6 +667,62 @@ const (
 	ImpersonationEventsInverseTable = "impersonation_events"
 	// ImpersonationEventsColumn is the table column denoting the impersonation_events relation/edge.
 	ImpersonationEventsColumn = "organization_id"
+	// AssessmentsTable is the table that holds the assessments relation/edge.
+	AssessmentsTable = "assessments"
+	// AssessmentsInverseTable is the table name for the Assessment entity.
+	// It exists in this package in order to avoid circular dependency with the "assessment" package.
+	AssessmentsInverseTable = "assessments"
+	// AssessmentsColumn is the table column denoting the assessments relation/edge.
+	AssessmentsColumn = "owner_id"
+	// AssessmentResponsesTable is the table that holds the assessment_responses relation/edge.
+	AssessmentResponsesTable = "assessment_responses"
+	// AssessmentResponsesInverseTable is the table name for the AssessmentResponse entity.
+	// It exists in this package in order to avoid circular dependency with the "assessmentresponse" package.
+	AssessmentResponsesInverseTable = "assessment_responses"
+	// AssessmentResponsesColumn is the table column denoting the assessment_responses relation/edge.
+	AssessmentResponsesColumn = "owner_id"
+	// CustomTypeEnumsTable is the table that holds the custom_type_enums relation/edge.
+	CustomTypeEnumsTable = "custom_type_enums"
+	// CustomTypeEnumsInverseTable is the table name for the CustomTypeEnum entity.
+	// It exists in this package in order to avoid circular dependency with the "customtypeenum" package.
+	CustomTypeEnumsInverseTable = "custom_type_enums"
+	// CustomTypeEnumsColumn is the table column denoting the custom_type_enums relation/edge.
+	CustomTypeEnumsColumn = "owner_id"
+	// TagDefinitionsTable is the table that holds the tag_definitions relation/edge.
+	TagDefinitionsTable = "tag_definitions"
+	// TagDefinitionsInverseTable is the table name for the TagDefinition entity.
+	// It exists in this package in order to avoid circular dependency with the "tagdefinition" package.
+	TagDefinitionsInverseTable = "tag_definitions"
+	// TagDefinitionsColumn is the table column denoting the tag_definitions relation/edge.
+	TagDefinitionsColumn = "owner_id"
+	// RemediationsTable is the table that holds the remediations relation/edge.
+	RemediationsTable = "remediations"
+	// RemediationsInverseTable is the table name for the Remediation entity.
+	// It exists in this package in order to avoid circular dependency with the "remediation" package.
+	RemediationsInverseTable = "remediations"
+	// RemediationsColumn is the table column denoting the remediations relation/edge.
+	RemediationsColumn = "owner_id"
+	// FindingsTable is the table that holds the findings relation/edge.
+	FindingsTable = "findings"
+	// FindingsInverseTable is the table name for the Finding entity.
+	// It exists in this package in order to avoid circular dependency with the "finding" package.
+	FindingsInverseTable = "findings"
+	// FindingsColumn is the table column denoting the findings relation/edge.
+	FindingsColumn = "owner_id"
+	// ReviewsTable is the table that holds the reviews relation/edge.
+	ReviewsTable = "reviews"
+	// ReviewsInverseTable is the table name for the Review entity.
+	// It exists in this package in order to avoid circular dependency with the "review" package.
+	ReviewsInverseTable = "reviews"
+	// ReviewsColumn is the table column denoting the reviews relation/edge.
+	ReviewsColumn = "owner_id"
+	// VulnerabilitiesTable is the table that holds the vulnerabilities relation/edge.
+	VulnerabilitiesTable = "vulnerabilities"
+	// VulnerabilitiesInverseTable is the table name for the Vulnerability entity.
+	// It exists in this package in order to avoid circular dependency with the "vulnerability" package.
+	VulnerabilitiesInverseTable = "vulnerabilities"
+	// VulnerabilitiesColumn is the table column denoting the vulnerabilities relation/edge.
+	VulnerabilitiesColumn = "owner_id"
 	// MembersTable is the table that holds the members relation/edge.
 	MembersTable = "org_memberships"
 	// MembersInverseTable is the table name for the OrgMembership entity.
@@ -713,7 +785,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [21]ent.Hook
+	Hooks        [22]ent.Hook
 	Interceptors [3]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -1763,6 +1835,118 @@ func ByImpersonationEvents(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOpti
 	}
 }
 
+// ByAssessmentsCount orders the results by assessments count.
+func ByAssessmentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAssessmentsStep(), opts...)
+	}
+}
+
+// ByAssessments orders the results by assessments terms.
+func ByAssessments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAssessmentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAssessmentResponsesCount orders the results by assessment_responses count.
+func ByAssessmentResponsesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAssessmentResponsesStep(), opts...)
+	}
+}
+
+// ByAssessmentResponses orders the results by assessment_responses terms.
+func ByAssessmentResponses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAssessmentResponsesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCustomTypeEnumsCount orders the results by custom_type_enums count.
+func ByCustomTypeEnumsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCustomTypeEnumsStep(), opts...)
+	}
+}
+
+// ByCustomTypeEnums orders the results by custom_type_enums terms.
+func ByCustomTypeEnums(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCustomTypeEnumsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByTagDefinitionsCount orders the results by tag_definitions count.
+func ByTagDefinitionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTagDefinitionsStep(), opts...)
+	}
+}
+
+// ByTagDefinitions orders the results by tag_definitions terms.
+func ByTagDefinitions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTagDefinitionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRemediationsCount orders the results by remediations count.
+func ByRemediationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRemediationsStep(), opts...)
+	}
+}
+
+// ByRemediations orders the results by remediations terms.
+func ByRemediations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRemediationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFindingsCount orders the results by findings count.
+func ByFindingsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFindingsStep(), opts...)
+	}
+}
+
+// ByFindings orders the results by findings terms.
+func ByFindings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFindingsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByReviewsCount orders the results by reviews count.
+func ByReviewsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReviewsStep(), opts...)
+	}
+}
+
+// ByReviews orders the results by reviews terms.
+func ByReviews(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReviewsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByVulnerabilitiesCount orders the results by vulnerabilities count.
+func ByVulnerabilitiesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVulnerabilitiesStep(), opts...)
+	}
+}
+
+// ByVulnerabilities orders the results by vulnerabilities terms.
+func ByVulnerabilities(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVulnerabilitiesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByMembersCount orders the results by members count.
 func ByMembersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -2250,6 +2434,62 @@ func newImpersonationEventsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ImpersonationEventsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ImpersonationEventsTable, ImpersonationEventsColumn),
+	)
+}
+func newAssessmentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AssessmentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AssessmentsTable, AssessmentsColumn),
+	)
+}
+func newAssessmentResponsesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AssessmentResponsesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AssessmentResponsesTable, AssessmentResponsesColumn),
+	)
+}
+func newCustomTypeEnumsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CustomTypeEnumsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CustomTypeEnumsTable, CustomTypeEnumsColumn),
+	)
+}
+func newTagDefinitionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TagDefinitionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TagDefinitionsTable, TagDefinitionsColumn),
+	)
+}
+func newRemediationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RemediationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RemediationsTable, RemediationsColumn),
+	)
+}
+func newFindingsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FindingsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FindingsTable, FindingsColumn),
+	)
+}
+func newReviewsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReviewsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
+	)
+}
+func newVulnerabilitiesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VulnerabilitiesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, VulnerabilitiesTable, VulnerabilitiesColumn),
 	)
 }
 func newMembersStep() *sqlgraph.Step {

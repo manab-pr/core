@@ -18,8 +18,11 @@ import (
 	"github.com/theopenlane/core/internal/ent/generated/control"
 	"github.com/theopenlane/core/internal/ent/generated/controlimplementation"
 	"github.com/theopenlane/core/internal/ent/generated/controlobjective"
+	"github.com/theopenlane/core/internal/ent/generated/customtypeenum"
 	"github.com/theopenlane/core/internal/ent/generated/entity"
 	"github.com/theopenlane/core/internal/ent/generated/evidence"
+	"github.com/theopenlane/core/internal/ent/generated/finding"
+	"github.com/theopenlane/core/internal/ent/generated/findingcontrol"
 	"github.com/theopenlane/core/internal/ent/generated/group"
 	"github.com/theopenlane/core/internal/ent/generated/internalpolicy"
 	"github.com/theopenlane/core/internal/ent/generated/mappedcontrol"
@@ -61,15 +64,19 @@ type ControlQuery struct {
 	withOwner                       *OrganizationQuery
 	withBlockedGroups               *GroupQuery
 	withEditors                     *GroupQuery
+	withControlKind                 *CustomTypeEnumQuery
 	withStandard                    *StandardQuery
 	withPrograms                    *ProgramQuery
 	withAssets                      *AssetQuery
 	withScans                       *ScanQuery
+	withFindings                    *FindingQuery
 	withControlImplementations      *ControlImplementationQuery
 	withSubcontrols                 *SubcontrolQuery
 	withScheduledJobs               *ScheduledJobQuery
 	withMappedToControls            *MappedControlQuery
 	withMappedFromControls          *MappedControlQuery
+	withControlMappings             *FindingControlQuery
+	withFKs                         bool
 	loadTotal                       []func(context.Context, []*Control) error
 	modifiers                       []func(*sql.Selector)
 	withNamedEvidence               map[string]*EvidenceQuery
@@ -86,11 +93,13 @@ type ControlQuery struct {
 	withNamedPrograms               map[string]*ProgramQuery
 	withNamedAssets                 map[string]*AssetQuery
 	withNamedScans                  map[string]*ScanQuery
+	withNamedFindings               map[string]*FindingQuery
 	withNamedControlImplementations map[string]*ControlImplementationQuery
 	withNamedSubcontrols            map[string]*SubcontrolQuery
 	withNamedScheduledJobs          map[string]*ScheduledJobQuery
 	withNamedMappedToControls       map[string]*MappedControlQuery
 	withNamedMappedFromControls     map[string]*MappedControlQuery
+	withNamedControlMappings        map[string]*FindingControlQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -502,6 +511,31 @@ func (_q *ControlQuery) QueryEditors() *GroupQuery {
 	return query
 }
 
+// QueryControlKind chains the current query on the "control_kind" edge.
+func (_q *ControlQuery) QueryControlKind() *CustomTypeEnumQuery {
+	query := (&CustomTypeEnumClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(control.Table, control.FieldID, selector),
+			sqlgraph.To(customtypeenum.Table, customtypeenum.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, control.ControlKindTable, control.ControlKindColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.CustomTypeEnum
+		step.Edge.Schema = schemaConfig.Control
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryStandard chains the current query on the "standard" edge.
 func (_q *ControlQuery) QueryStandard() *StandardQuery {
 	query := (&StandardClient{config: _q.config}).Query()
@@ -596,6 +630,31 @@ func (_q *ControlQuery) QueryScans() *ScanQuery {
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.Scan
 		step.Edge.Schema = schemaConfig.Scan
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFindings chains the current query on the "findings" edge.
+func (_q *ControlQuery) QueryFindings() *FindingQuery {
+	query := (&FindingClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(control.Table, control.FieldID, selector),
+			sqlgraph.To(finding.Table, finding.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, control.FindingsTable, control.FindingsPrimaryKey...),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.Finding
+		step.Edge.Schema = schemaConfig.FindingControl
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -721,6 +780,31 @@ func (_q *ControlQuery) QueryMappedFromControls() *MappedControlQuery {
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MappedControl
 		step.Edge.Schema = schemaConfig.MappedControlFromControls
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryControlMappings chains the current query on the "control_mappings" edge.
+func (_q *ControlQuery) QueryControlMappings() *FindingControlQuery {
+	query := (&FindingControlClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(control.Table, control.FieldID, selector),
+			sqlgraph.To(findingcontrol.Table, findingcontrol.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, control.ControlMappingsTable, control.ControlMappingsColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.FindingControl
+		step.Edge.Schema = schemaConfig.FindingControl
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -934,15 +1018,18 @@ func (_q *ControlQuery) Clone() *ControlQuery {
 		withOwner:                  _q.withOwner.Clone(),
 		withBlockedGroups:          _q.withBlockedGroups.Clone(),
 		withEditors:                _q.withEditors.Clone(),
+		withControlKind:            _q.withControlKind.Clone(),
 		withStandard:               _q.withStandard.Clone(),
 		withPrograms:               _q.withPrograms.Clone(),
 		withAssets:                 _q.withAssets.Clone(),
 		withScans:                  _q.withScans.Clone(),
+		withFindings:               _q.withFindings.Clone(),
 		withControlImplementations: _q.withControlImplementations.Clone(),
 		withSubcontrols:            _q.withSubcontrols.Clone(),
 		withScheduledJobs:          _q.withScheduledJobs.Clone(),
 		withMappedToControls:       _q.withMappedToControls.Clone(),
 		withMappedFromControls:     _q.withMappedFromControls.Clone(),
+		withControlMappings:        _q.withControlMappings.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -1115,6 +1202,17 @@ func (_q *ControlQuery) WithEditors(opts ...func(*GroupQuery)) *ControlQuery {
 	return _q
 }
 
+// WithControlKind tells the query-builder to eager-load the nodes that are connected to
+// the "control_kind" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ControlQuery) WithControlKind(opts ...func(*CustomTypeEnumQuery)) *ControlQuery {
+	query := (&CustomTypeEnumClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withControlKind = query
+	return _q
+}
+
 // WithStandard tells the query-builder to eager-load the nodes that are connected to
 // the "standard" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *ControlQuery) WithStandard(opts ...func(*StandardQuery)) *ControlQuery {
@@ -1156,6 +1254,17 @@ func (_q *ControlQuery) WithScans(opts ...func(*ScanQuery)) *ControlQuery {
 		opt(query)
 	}
 	_q.withScans = query
+	return _q
+}
+
+// WithFindings tells the query-builder to eager-load the nodes that are connected to
+// the "findings" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ControlQuery) WithFindings(opts ...func(*FindingQuery)) *ControlQuery {
+	query := (&FindingClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withFindings = query
 	return _q
 }
 
@@ -1211,6 +1320,17 @@ func (_q *ControlQuery) WithMappedFromControls(opts ...func(*MappedControlQuery)
 		opt(query)
 	}
 	_q.withMappedFromControls = query
+	return _q
+}
+
+// WithControlMappings tells the query-builder to eager-load the nodes that are connected to
+// the "control_mappings" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ControlQuery) WithControlMappings(opts ...func(*FindingControlQuery)) *ControlQuery {
+	query := (&FindingControlClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withControlMappings = query
 	return _q
 }
 
@@ -1297,8 +1417,9 @@ func (_q *ControlQuery) prepareQuery(ctx context.Context) error {
 func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Control, error) {
 	var (
 		nodes       = []*Control{}
+		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [24]bool{
+		loadedTypes = [27]bool{
 			_q.withEvidence != nil,
 			_q.withControlObjectives != nil,
 			_q.withTasks != nil,
@@ -1314,17 +1435,23 @@ func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 			_q.withOwner != nil,
 			_q.withBlockedGroups != nil,
 			_q.withEditors != nil,
+			_q.withControlKind != nil,
 			_q.withStandard != nil,
 			_q.withPrograms != nil,
 			_q.withAssets != nil,
 			_q.withScans != nil,
+			_q.withFindings != nil,
 			_q.withControlImplementations != nil,
 			_q.withSubcontrols != nil,
 			_q.withScheduledJobs != nil,
 			_q.withMappedToControls != nil,
 			_q.withMappedFromControls != nil,
+			_q.withControlMappings != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, control.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Control).scanValues(nil, columns)
 	}
@@ -1451,6 +1578,12 @@ func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 			return nil, err
 		}
 	}
+	if query := _q.withControlKind; query != nil {
+		if err := _q.loadControlKind(ctx, query, nodes, nil,
+			func(n *Control, e *CustomTypeEnum) { n.Edges.ControlKind = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withStandard; query != nil {
 		if err := _q.loadStandard(ctx, query, nodes, nil,
 			func(n *Control, e *Standard) { n.Edges.Standard = e }); err != nil {
@@ -1475,6 +1608,13 @@ func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 		if err := _q.loadScans(ctx, query, nodes,
 			func(n *Control) { n.Edges.Scans = []*Scan{} },
 			func(n *Control, e *Scan) { n.Edges.Scans = append(n.Edges.Scans, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withFindings; query != nil {
+		if err := _q.loadFindings(ctx, query, nodes,
+			func(n *Control) { n.Edges.Findings = []*Finding{} },
+			func(n *Control, e *Finding) { n.Edges.Findings = append(n.Edges.Findings, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1512,6 +1652,13 @@ func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 		if err := _q.loadMappedFromControls(ctx, query, nodes,
 			func(n *Control) { n.Edges.MappedFromControls = []*MappedControl{} },
 			func(n *Control, e *MappedControl) { n.Edges.MappedFromControls = append(n.Edges.MappedFromControls, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withControlMappings; query != nil {
+		if err := _q.loadControlMappings(ctx, query, nodes,
+			func(n *Control) { n.Edges.ControlMappings = []*FindingControl{} },
+			func(n *Control, e *FindingControl) { n.Edges.ControlMappings = append(n.Edges.ControlMappings, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1613,6 +1760,13 @@ func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 			return nil, err
 		}
 	}
+	for name, query := range _q.withNamedFindings {
+		if err := _q.loadFindings(ctx, query, nodes,
+			func(n *Control) { n.appendNamedFindings(name) },
+			func(n *Control, e *Finding) { n.appendNamedFindings(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range _q.withNamedControlImplementations {
 		if err := _q.loadControlImplementations(ctx, query, nodes,
 			func(n *Control) { n.appendNamedControlImplementations(name) },
@@ -1645,6 +1799,13 @@ func (_q *ControlQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cont
 		if err := _q.loadMappedFromControls(ctx, query, nodes,
 			func(n *Control) { n.appendNamedMappedFromControls(name) },
 			func(n *Control, e *MappedControl) { n.appendNamedMappedFromControls(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range _q.withNamedControlMappings {
+		if err := _q.loadControlMappings(ctx, query, nodes,
+			func(n *Control) { n.appendNamedControlMappings(name) },
+			func(n *Control, e *FindingControl) { n.appendNamedControlMappings(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2426,6 +2587,35 @@ func (_q *ControlQuery) loadEditors(ctx context.Context, query *GroupQuery, node
 	}
 	return nil
 }
+func (_q *ControlQuery) loadControlKind(ctx context.Context, query *CustomTypeEnumQuery, nodes []*Control, init func(*Control), assign func(*Control, *CustomTypeEnum)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Control)
+	for i := range nodes {
+		fk := nodes[i].ControlKindID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(customtypeenum.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "control_kind_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (_q *ControlQuery) loadStandard(ctx context.Context, query *StandardQuery, nodes []*Control, init func(*Control), assign func(*Control, *Standard)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Control)
@@ -2607,6 +2797,68 @@ func (_q *ControlQuery) loadScans(ctx context.Context, query *ScanQuery, nodes [
 			return fmt.Errorf(`unexpected referenced foreign-key "control_scans" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (_q *ControlQuery) loadFindings(ctx context.Context, query *FindingQuery, nodes []*Control, init func(*Control), assign func(*Control, *Finding)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*Control)
+	nids := make(map[string]map[*Control]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(control.FindingsTable)
+		joinT.Schema(_q.schemaConfig.FindingControl)
+		s.Join(joinT).On(s.C(finding.FieldID), joinT.C(control.FindingsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(control.FindingsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(control.FindingsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := values[1].(*sql.NullString).String
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Control]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Finding](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "findings" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }
@@ -2889,6 +3141,36 @@ func (_q *ControlQuery) loadMappedFromControls(ctx context.Context, query *Mappe
 	}
 	return nil
 }
+func (_q *ControlQuery) loadControlMappings(ctx context.Context, query *FindingControlQuery, nodes []*Control, init func(*Control), assign func(*Control, *FindingControl)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Control)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(findingcontrol.FieldControlID)
+	}
+	query.Where(predicate.FindingControl(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(control.ControlMappingsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ControlID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "control_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (_q *ControlQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -2931,6 +3213,9 @@ func (_q *ControlQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withOwner != nil {
 			_spec.Node.AddColumnOnce(control.FieldOwnerID)
+		}
+		if _q.withControlKind != nil {
+			_spec.Node.AddColumnOnce(control.FieldControlKindID)
 		}
 		if _q.withStandard != nil {
 			_spec.Node.AddColumnOnce(control.FieldStandardID)
@@ -3199,6 +3484,20 @@ func (_q *ControlQuery) WithNamedScans(name string, opts ...func(*ScanQuery)) *C
 	return _q
 }
 
+// WithNamedFindings tells the query-builder to eager-load the nodes that are connected to the "findings"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *ControlQuery) WithNamedFindings(name string, opts ...func(*FindingQuery)) *ControlQuery {
+	query := (&FindingClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedFindings == nil {
+		_q.withNamedFindings = make(map[string]*FindingQuery)
+	}
+	_q.withNamedFindings[name] = query
+	return _q
+}
+
 // WithNamedControlImplementations tells the query-builder to eager-load the nodes that are connected to the "control_implementations"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (_q *ControlQuery) WithNamedControlImplementations(name string, opts ...func(*ControlImplementationQuery)) *ControlQuery {
@@ -3266,6 +3565,20 @@ func (_q *ControlQuery) WithNamedMappedFromControls(name string, opts ...func(*M
 		_q.withNamedMappedFromControls = make(map[string]*MappedControlQuery)
 	}
 	_q.withNamedMappedFromControls[name] = query
+	return _q
+}
+
+// WithNamedControlMappings tells the query-builder to eager-load the nodes that are connected to the "control_mappings"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *ControlQuery) WithNamedControlMappings(name string, opts ...func(*FindingControlQuery)) *ControlQuery {
+	query := (&FindingControlClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedControlMappings == nil {
+		_q.withNamedControlMappings = make(map[string]*FindingControlQuery)
+	}
+	_q.withNamedControlMappings[name] = query
 	return _q
 }
 

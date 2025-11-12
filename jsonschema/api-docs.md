@@ -20,7 +20,7 @@ Config contains the configuration for the core server
 |[**email**](#email)|`object`|||
 |[**sessions**](#sessions)|`object`|||
 |[**totp**](#totp)|`object`|||
-|[**ratelimit**](#ratelimit)|`object`|Config defines the configuration settings for the default rate limiter<br/>||
+|[**ratelimit**](#ratelimit)|`object`|Config defines the configuration settings for the rate limiter middleware.<br/>||
 |[**objectStorage**](#objectstorage)|`object`|ProviderConfig contains configuration for object storage providers<br/>||
 |[**subscription**](#subscription)|`object`|||
 |[**keywatcher**](#keywatcher)|`object`|KeyWatcher contains settings for the key watcher that manages JWT signing keys<br/>||
@@ -61,11 +61,15 @@ Config contains the configuration for the core server
         "modules": {},
         "emailValidation": {
             "allowedEmailTypes": {}
-        }
+        },
+        "billing": {}
     },
     "auth": {
         "token": {
-            "keys": {}
+            "keys": {},
+            "redis": {
+                "config": {}
+            }
         },
         "providers": {
             "github": {},
@@ -99,7 +103,11 @@ Config contains the configuration for the core server
     },
     "sessions": {},
     "totp": {},
-    "ratelimit": {},
+    "ratelimit": {
+        "options": [
+            {}
+        ]
+    },
     "objectStorage": {
         "providers": {
             "s3": {
@@ -119,7 +127,9 @@ Config contains the configuration for the core server
             }
         }
     },
-    "subscription": {},
+    "subscription": {
+        "stripeWebhookSecrets": {}
+    },
     "keywatcher": {},
     "slack": {},
     "integrationOauthProvider": {
@@ -155,6 +165,7 @@ Server settings for the echo server
 |[**mime**](#servermime)|`object`|Config defines the config for Mime middleware<br/>|no|
 |[**graphPool**](#servergraphpool)|`object`|PondPool contains the settings for the goroutine pool<br/>|no|
 |**enableGraphExtensions**|`boolean`|EnableGraphExtensions enables the graph extensions for the graph resolvers<br/>|no|
+|**enableGraphSubscriptions**|`boolean`|EnableGraphSubscriptions enables graphql subscriptions to the server using websockets or sse<br/>|no|
 |**complexityLimit**|`integer`|ComplexityLimit sets the maximum complexity allowed for a query<br/>|no|
 |**maxResultLimit**|`integer`|MaxResultLimit sets the maximum number of results allowed for a query<br/>|no|
 |[**csrfProtection**](#servercsrfprotection)|`object`|Config defines configuration for the CSRF middleware wrapper.<br/>|no|
@@ -414,6 +425,7 @@ Config holds the configuration for the ent server
 |[**modules**](#entconfigmodules)|`object`|Modules settings for features access<br/>||
 |**maxSchemaImportSize**|`integer`|MaxSchemaImportSize is the maximum size allowed for schema imports in bytes<br/>||
 |[**emailValidation**](#entconfigemailvalidation)|`object`|EmailVerificationConfig is the configuration for email verification<br/>||
+|[**billing**](#entconfigbilling)|`object`|Billing settings for feature access<br/>||
 
 **Additional Properties:** not allowed  
 **Example**
@@ -431,7 +443,8 @@ Config holds the configuration for the ent server
     "modules": {},
     "emailValidation": {
         "allowedEmailTypes": {}
-    }
+    },
+    "billing": {}
 }
 ```
 
@@ -617,6 +630,26 @@ AllowedEmailTypes defines the allowed email types for verification
 |**role**|`boolean`|Role indicates whether role-based email addresses are allowed<br/>||
 
 **Additional Properties:** not allowed  
+<a name="entconfigbilling"></a>
+### entConfig\.billing: object
+
+Billing settings for feature access
+
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**requirePaymentMethod**|`boolean`|RequirePaymentMethod indicates whether to check if a payment method<br/>exists for orgs before they can access some resource<br/>||
+|[**bypassEmailDomains**](#entconfigbillingbypassemaildomains)|`string[]`|||
+
+**Additional Properties:** not allowed  
+<a name="entconfigbillingbypassemaildomains"></a>
+#### entConfig\.billing\.bypassEmailDomains: array
+
+**Items**
+
+**Item Type:** `string`  
 <a name="auth"></a>
 ## auth: object
 
@@ -638,7 +671,10 @@ Auth settings including oauth2 providers and token configuration
 ```json
 {
     "token": {
-        "keys": {}
+        "keys": {},
+        "redis": {
+            "config": {}
+        }
     },
     "providers": {
         "github": {},
@@ -665,13 +701,18 @@ Auth settings including oauth2 providers and token configuration
 |**jwksEndpoint**|`string`||no|
 |[**keys**](#authtokenkeys)|`object`||yes|
 |**generateKeys**|`boolean`||no|
+|**jwksCacheTTL**|`integer`||no|
+|[**redis**](#authtokenredis)|`object`||no|
 
 **Additional Properties:** not allowed  
 **Example**
 
 ```json
 {
-    "keys": {}
+    "keys": {},
+    "redis": {
+        "config": {}
+    }
 }
 ```
 
@@ -684,6 +725,48 @@ Auth settings including oauth2 providers and token configuration
 |----|----|-----------|--------|
 |**Additional Properties**|`string`|||
 
+<a name="authtokenredis"></a>
+#### auth\.token\.redis: object
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**enabled**|`boolean`|||
+|[**config**](#authtokenredisconfig)|`object`|||
+|**blacklistPrefix**|`string`|||
+
+**Additional Properties:** not allowed  
+**Example**
+
+```json
+{
+    "config": {}
+}
+```
+
+<a name="authtokenredisconfig"></a>
+##### auth\.token\.redis\.config: object
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**enabled**|`boolean`|||
+|**address**|`string`|||
+|**name**|`string`|||
+|**username**|`string`|||
+|**password**|`string`|||
+|**db**|`integer`|||
+|**dialTimeout**|`integer`|||
+|**readTimeout**|`integer`|||
+|**writeTimeout**|`integer`|||
+|**maxRetries**|`integer`|||
+|**minIdleConns**|`integer`|||
+|**maxIdleConns**|`integer`|||
+|**maxActiveConns**|`integer`|||
+
+**Additional Properties:** not allowed  
 <a name="authsupportedproviders"></a>
 ### auth\.supportedProviders: array
 
@@ -794,7 +877,6 @@ OauthProviderConfig represents the configuration for OAuth providers such as Git
 |**createNewModel**|`boolean`|force create a new model<br/>|no|
 |**modelFile**|`string`|path to the fga model file<br/>|no|
 |[**credentials**](#authzcredentials)|`object`||no|
-|**ignoreDuplicateKeyError**|`boolean`|ignore duplicate key error<br/>|no|
 
 **Additional Properties:** not allowed  
 **Example**
@@ -1167,7 +1249,7 @@ OauthProviderConfig represents the configuration for OAuth providers such as Git
 <a name="ratelimit"></a>
 ## ratelimit: object
 
-Config defines the configuration settings for the default rate limiter
+Config defines the configuration settings for the rate limiter middleware.
 
 
 **Properties**
@@ -1175,11 +1257,47 @@ Config defines the configuration settings for the default rate limiter
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**enabled**|`boolean`|||
-|**limit**|`number`|||
-|**burst**|`integer`|||
-|**expires**|`integer`|||
+|[**options**](#ratelimitoptions)|`array`|||
+|[**headers**](#ratelimitheaders)|`string[]`|||
+|**forwardedIndexFromBehind**|`integer`|ForwardedIndexFromBehind selects which IP from X-Forwarded-For should be used.<br/>0 means the closest client, 1 the proxy behind it, etc.<br/>||
+|**includePath**|`boolean`|IncludePath appends the request path to the limiter key when true.<br/>||
+|**includeMethod**|`boolean`|IncludeMethod appends the request method to the limiter key when true.<br/>||
+|**keyPrefix**|`string`|KeyPrefix allows scoping the limiter key space with a static prefix.<br/>||
+|**denyStatus**|`integer`|DenyStatus overrides the HTTP status code returned when a rate limit is exceeded.<br/>||
+|**denyMessage**|`string`|DenyMessage customises the error payload when a rate limit is exceeded.<br/>||
+|**sendRetryAfterHeader**|`boolean`|SendRetryAfterHeader toggles whether the Retry-After header should be added when available.<br/>||
+|**dryRun**|`boolean`|DryRun enables logging rate limit decisions without blocking requests.<br/>||
 
 **Additional Properties:** not allowed  
+**Example**
+
+```json
+{
+    "options": [
+        {}
+    ]
+}
+```
+
+<a name="ratelimitoptions"></a>
+### ratelimit\.options: array
+
+**Items**
+
+**Example**
+
+```json
+[
+    {}
+]
+```
+
+<a name="ratelimitheaders"></a>
+### ratelimit\.headers: array
+
+**Items**
+
+**Item Type:** `string`  
 <a name="objectstorage"></a>
 ## objectStorage: object
 
@@ -1498,13 +1616,33 @@ ProviderCredentials contains credentials for a storage provider
 |----|----|-----------|--------|
 |**enabled**|`boolean`|Enabled determines if the entitlements service is enabled<br/>||
 |**privateStripeKey**|`string`|PrivateStripeKey is the key for the stripe service<br/>||
-|**stripeWebhookSecret**|`string`|StripeWebhookSecret is the secret for the stripe service<br/>||
+|**stripeWebhookSecret**|`string`|StripeWebhookSecret is the secret for the stripe service (legacy, use StripeWebhookSecrets for version-specific secrets)<br/>||
+|[**stripeWebhookSecrets**](#subscriptionstripewebhooksecrets)|`object`|||
 |**stripeWebhookURL**|`string`|StripeWebhookURL is the URL for the stripe webhook<br/>||
 |**stripeBillingPortalSuccessURL**|`string`|StripeBillingPortalSuccessURL<br/>||
 |**stripeCancellationReturnURL**|`string`|StripeCancellationReturnURL is the URL for the stripe cancellation return<br/>||
 |[**stripeWebhookEvents**](#subscriptionstripewebhookevents)|`string[]`|||
+|**stripeWebhookAPIVersion**|`string`|StripeWebhookAPIVersion is the Stripe API version currently accepted by the webhook handler<br/>||
+|**stripeWebhookDiscardAPIVersion**|`string`|StripeWebhookDiscardAPIVersion is the Stripe API version to discard during migration<br/>||
 
 **Additional Properties:** not allowed  
+**Example**
+
+```json
+{
+    "stripeWebhookSecrets": {}
+}
+```
+
+<a name="subscriptionstripewebhooksecrets"></a>
+### subscription\.stripeWebhookSecrets: object
+
+**Additional Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**Additional Properties**|`string`|||
+
 <a name="subscriptionstripewebhookevents"></a>
 ### subscription\.stripeWebhookEvents: array
 

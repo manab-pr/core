@@ -446,6 +446,9 @@ func TestMutationUpdateTrustCenter(t *testing.T) {
 			trustCenterID: trustCenter.ID,
 			request: testclient.UpdateTrustCenterInput{
 				CustomDomainID: &customDomain.ID,
+				AddPost: &testclient.CreateNoteInput{
+					Text: "Adding a post about obtaining our SOC 2 compliance attestation.",
+				},
 			},
 			client: suite.client.api,
 			ctx:    testUser1.UserCtx,
@@ -458,6 +461,9 @@ func TestMutationUpdateTrustCenter(t *testing.T) {
 					Title:        lo.ToPtr("Updated Trust Center Title"),
 					Overview:     lo.ToPtr("Updated Trust Center Overview"),
 					PrimaryColor: lo.ToPtr("#FF5733"),
+				},
+				AddPost: &testclient.CreateNoteInput{
+					Text: "Adding a post about obtaining our FedRamp Moderate compliance attestation.",
 				},
 			},
 			client: suite.client.api,
@@ -538,6 +544,13 @@ func TestMutationUpdateTrustCenter(t *testing.T) {
 			// Check updated fields
 			if tc.request.Tags != nil {
 				assert.Check(t, is.DeepEqual(tc.request.Tags, resp.UpdateTrustCenter.TrustCenter.Tags))
+
+				tagDefs, err := tc.client.GetTagDefinitions(tc.ctx, nil, nil, &testclient.TagDefinitionWhereInput{
+					NameIn: tc.request.Tags,
+				})
+
+				assert.NilError(t, err)
+				assert.Check(t, is.Len(tagDefs.TagDefinitions.Edges, len(tc.request.Tags)))
 			}
 
 			if tc.request.CustomDomainID != nil {
@@ -548,6 +561,19 @@ func TestMutationUpdateTrustCenter(t *testing.T) {
 				assert.Check(t, is.Equal(*tc.request.UpdateTrustCenterSetting.Title, *resp.UpdateTrustCenter.TrustCenter.GetSetting().Title))
 				assert.Check(t, is.Equal(*tc.request.UpdateTrustCenterSetting.Overview, *resp.UpdateTrustCenter.TrustCenter.GetSetting().Overview))
 				assert.Check(t, is.Equal(*tc.request.UpdateTrustCenterSetting.PrimaryColor, *resp.UpdateTrustCenter.TrustCenter.GetSetting().PrimaryColor))
+			}
+
+			if tc.request.AddPost != nil {
+				assert.Check(t, resp.UpdateTrustCenter.TrustCenter.Posts.Edges != nil)
+				assert.Check(t, len(resp.UpdateTrustCenter.TrustCenter.Posts.Edges) > 0)
+				found := false
+				for _, edge := range resp.UpdateTrustCenter.TrustCenter.Posts.Edges {
+					if edge.Node.Text == tc.request.AddPost.Text {
+						found = true
+						break
+					}
+				}
+				assert.Check(t, found, "expected post text not found in trust center posts")
 			}
 		})
 	}

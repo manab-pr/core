@@ -13,6 +13,7 @@ server:
     sameSite: Lax
     cookiePath: /
   enableGraphExtensions: true
+  enableGraphSubscriptions: false
   cacheControl:
     enabled: false
   cors:
@@ -123,6 +124,12 @@ email:
 
 ratelimit:
   enabled: false
+  includeMethod: false
+  includePath: false
+  sendRetryAfterHeader: true
+  options:
+    - requests: 10
+      window: 1s
 
 entConfig:
   maxSchemaImportSize: 262144

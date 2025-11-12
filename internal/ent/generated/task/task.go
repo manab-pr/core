@@ -36,6 +36,10 @@ const (
 	FieldTags = "tags"
 	// FieldOwnerID holds the string denoting the owner_id field in the database.
 	FieldOwnerID = "owner_id"
+	// FieldTaskKindName holds the string denoting the task_kind_name field in the database.
+	FieldTaskKindName = "task_kind_name"
+	// FieldTaskKindID holds the string denoting the task_kind_id field in the database.
+	FieldTaskKindID = "task_kind_id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldDetails holds the string denoting the details field in the database.
@@ -52,8 +56,16 @@ const (
 	FieldAssigneeID = "assignee_id"
 	// FieldAssignerID holds the string denoting the assigner_id field in the database.
 	FieldAssignerID = "assigner_id"
+	// FieldSystemGenerated holds the string denoting the system_generated field in the database.
+	FieldSystemGenerated = "system_generated"
+	// FieldIdempotencyKey holds the string denoting the idempotency_key field in the database.
+	FieldIdempotencyKey = "idempotency_key"
+	// FieldExternalReferenceURL holds the string denoting the external_reference_url field in the database.
+	FieldExternalReferenceURL = "external_reference_url"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
+	// EdgeTaskKind holds the string denoting the task_kind edge name in mutations.
+	EdgeTaskKind = "task_kind"
 	// EdgeAssigner holds the string denoting the assigner edge name in mutations.
 	EdgeAssigner = "assigner"
 	// EdgeAssignee holds the string denoting the assignee edge name in mutations.
@@ -78,6 +90,8 @@ const (
 	EdgeRisks = "risks"
 	// EdgeControlImplementations holds the string denoting the control_implementations edge name in mutations.
 	EdgeControlImplementations = "control_implementations"
+	// EdgeActionPlans holds the string denoting the action_plans edge name in mutations.
+	EdgeActionPlans = "action_plans"
 	// EdgeEvidence holds the string denoting the evidence edge name in mutations.
 	EdgeEvidence = "evidence"
 	// Table holds the table name of the task in the database.
@@ -89,6 +103,13 @@ const (
 	OwnerInverseTable = "organizations"
 	// OwnerColumn is the table column denoting the owner relation/edge.
 	OwnerColumn = "owner_id"
+	// TaskKindTable is the table that holds the task_kind relation/edge.
+	TaskKindTable = "tasks"
+	// TaskKindInverseTable is the table name for the CustomTypeEnum entity.
+	// It exists in this package in order to avoid circular dependency with the "customtypeenum" package.
+	TaskKindInverseTable = "custom_type_enums"
+	// TaskKindColumn is the table column denoting the task_kind relation/edge.
+	TaskKindColumn = "task_kind_id"
 	// AssignerTable is the table that holds the assigner relation/edge.
 	AssignerTable = "tasks"
 	// AssignerInverseTable is the table name for the User entity.
@@ -155,6 +176,11 @@ const (
 	// ControlImplementationsInverseTable is the table name for the ControlImplementation entity.
 	// It exists in this package in order to avoid circular dependency with the "controlimplementation" package.
 	ControlImplementationsInverseTable = "control_implementations"
+	// ActionPlansTable is the table that holds the action_plans relation/edge. The primary key declared below.
+	ActionPlansTable = "action_plan_tasks"
+	// ActionPlansInverseTable is the table name for the ActionPlan entity.
+	// It exists in this package in order to avoid circular dependency with the "actionplan" package.
+	ActionPlansInverseTable = "action_plans"
 	// EvidenceTable is the table that holds the evidence relation/edge. The primary key declared below.
 	EvidenceTable = "task_evidence"
 	// EvidenceInverseTable is the table name for the Evidence entity.
@@ -174,6 +200,8 @@ var Columns = []string{
 	FieldDisplayID,
 	FieldTags,
 	FieldOwnerID,
+	FieldTaskKindName,
+	FieldTaskKindID,
 	FieldTitle,
 	FieldDetails,
 	FieldStatus,
@@ -182,6 +210,20 @@ var Columns = []string{
 	FieldCompleted,
 	FieldAssigneeID,
 	FieldAssignerID,
+	FieldSystemGenerated,
+	FieldIdempotencyKey,
+	FieldExternalReferenceURL,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "tasks"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"custom_type_enum_tasks",
+	"finding_tasks",
+	"integration_tasks",
+	"remediation_tasks",
+	"review_tasks",
+	"vulnerability_tasks",
 }
 
 var (
@@ -212,6 +254,9 @@ var (
 	// ControlImplementationsPrimaryKey and ControlImplementationsColumn2 are the table columns denoting the
 	// primary key for the control_implementations relation (M2M).
 	ControlImplementationsPrimaryKey = []string{"control_implementation_id", "task_id"}
+	// ActionPlansPrimaryKey and ActionPlansColumn2 are the table columns denoting the
+	// primary key for the action_plans relation (M2M).
+	ActionPlansPrimaryKey = []string{"action_plan_id", "task_id"}
 	// EvidencePrimaryKey and EvidenceColumn2 are the table columns denoting the
 	// primary key for the evidence relation (M2M).
 	EvidencePrimaryKey = []string{"task_id", "evidence_id"}
@@ -224,6 +269,11 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
@@ -233,7 +283,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/theopenlane/core/internal/ent/generated/runtime"
 var (
-	Hooks        [9]ent.Hook
+	Hooks        [11]ent.Hook
 	Interceptors [4]ent.Interceptor
 	Policy       ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -250,6 +300,10 @@ var (
 	OwnerIDValidator func(string) error
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
+	// DefaultSystemGenerated holds the default value on creation for the "system_generated" field.
+	DefaultSystemGenerated bool
+	// ExternalReferenceURLValidator is a validator for the "external_reference_url" field. It is called by the builders before save.
+	ExternalReferenceURLValidator func([]string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
@@ -314,6 +368,16 @@ func ByOwnerID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOwnerID, opts...).ToFunc()
 }
 
+// ByTaskKindName orders the results by the task_kind_name field.
+func ByTaskKindName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTaskKindName, opts...).ToFunc()
+}
+
+// ByTaskKindID orders the results by the task_kind_id field.
+func ByTaskKindID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTaskKindID, opts...).ToFunc()
+}
+
 // ByTitle orders the results by the title field.
 func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
@@ -354,10 +418,27 @@ func ByAssignerID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAssignerID, opts...).ToFunc()
 }
 
+// BySystemGenerated orders the results by the system_generated field.
+func BySystemGenerated(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSystemGenerated, opts...).ToFunc()
+}
+
+// ByIdempotencyKey orders the results by the idempotency_key field.
+func ByIdempotencyKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIdempotencyKey, opts...).ToFunc()
+}
+
 // ByOwnerField orders the results by owner field.
 func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByTaskKindField orders the results by task_kind field.
+func ByTaskKindField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTaskKindStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -515,6 +596,20 @@ func ByControlImplementations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderO
 	}
 }
 
+// ByActionPlansCount orders the results by action_plans count.
+func ByActionPlansCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newActionPlansStep(), opts...)
+	}
+}
+
+// ByActionPlans orders the results by action_plans terms.
+func ByActionPlans(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newActionPlansStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByEvidenceCount orders the results by evidence count.
 func ByEvidenceCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -533,6 +628,13 @@ func newOwnerStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OwnerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
+}
+func newTaskKindStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TaskKindInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, TaskKindTable, TaskKindColumn),
 	)
 }
 func newAssignerStep() *sqlgraph.Step {
@@ -617,6 +719,13 @@ func newControlImplementationsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ControlImplementationsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ControlImplementationsTable, ControlImplementationsPrimaryKey...),
+	)
+}
+func newActionPlansStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ActionPlansInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ActionPlansTable, ActionPlansPrimaryKey...),
 	)
 }
 func newEvidenceStep() *sqlgraph.Step {

@@ -76,6 +76,9 @@ func (Program) Fields() []ent.Field {
 			GoType(enums.ProgramType("")).
 			Annotations(
 				entgql.OrderField("PROGRAM_TYPE"),
+				entgql.Directives(
+					entgql.Deprecated("Use `program_kind` instead."),
+				),
 			).
 			Default(enums.ProgramTypeFramework.String()),
 		field.String("framework_name").
@@ -133,6 +136,7 @@ func (p Program) Mixin() []ent.Mixin {
 			newOrgOwnedMixin(p),
 			// add group permissions to the program
 			newGroupPermissionsMixin(),
+			newCustomEnumMixin(p),
 		},
 	}.getMixins(p)
 }
@@ -175,12 +179,12 @@ func (p Program) Edges() []ent.Edge {
 				entgql.MultiOrder(),
 			).
 			Through("members", ProgramMembership.Type),
-
 		uniqueEdgeFrom(&edgeDefinition{
 			fromSchema: p,
-			edgeSchema: User{},
-			ref:        "program_owner",
+			name:       "program_owner",
+			t:          User.Type,
 			field:      "program_owner_id",
+			ref:        "programs_owned",
 			annotations: []schema.Annotation{
 				accessmap.EdgeNoAuthCheck(),
 			},

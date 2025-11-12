@@ -29,6 +29,14 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input generated.Creat
 		return nil, parseRequestError(err, action{action: ActionCreate, object: "task"})
 	}
 
+	// Publish task creation event to subscribers if assignee is set
+	if r.subscriptionManager != nil && input.AssigneeID != nil && *input.AssigneeID != "" {
+		if err := r.subscriptionManager.Publish(*input.AssigneeID, res); err != nil {
+			log.Error().Err(err).Str("task_id", res.ID).Str("assignee_id", *input.AssigneeID).
+				Msg("failed to publish task creation event")
+		}
+	}
+
 	return &model.TaskCreatePayload{
 		Task: res,
 	}, nil
@@ -124,6 +132,15 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, id string) (*model.Ta
 	return &model.TaskDeletePayload{
 		DeletedID: id,
 	}, nil
+}
+
+// DeleteBulkTask is the resolver for the deleteBulkTask field.
+func (r *mutationResolver) DeleteBulkTask(ctx context.Context, ids []string) (*model.TaskBulkDeletePayload, error) {
+	if len(ids) == 0 {
+		return nil, rout.NewMissingRequiredFieldError("ids")
+	}
+
+	return r.bulkDeleteTask(ctx, ids)
 }
 
 // Task is the resolver for the task field.
